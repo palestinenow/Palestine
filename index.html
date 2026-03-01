@@ -14,9 +14,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
-  <!-- Data File -->
-  <script src="data.js"></script>
-
   <style>
     :root {
       --bg: #050505;
@@ -644,23 +641,10 @@
       border-radius: 16px;
     }
 
-    .palestine-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
     .palestine-card:hover {
       border-color: var(--accent-gold);
       transform: translateY(-10px) scale(1.02);
       box-shadow: 0 30px 60px rgba(212, 175, 55, 0.2);
-    }
-
-    .palestine-card:hover::before {
-      opacity: 1;
     }
 
     .palestine-card:hover::after {
@@ -748,6 +732,75 @@
       letter-spacing: 0.1em;
       padding: 8px 0;
       background: linear-gradient(90deg, var(--accent-purple), #b84c6c);
+      color: white;
+      font-weight: 900;
+      opacity: 0;
+      transform: translateY(100%);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* External Actors Section (America & ISIS) */
+    .external-section {
+      position: relative;
+      border: 2px solid rgba(107, 114, 128, 0.4);
+      background: linear-gradient(145deg, rgba(20, 20, 25, 0.8), rgba(10,10,10,0.95));
+      backdrop-filter: blur(20px);
+      margin-top: 4rem;
+      margin-bottom: 4rem;
+      overflow: hidden;
+      border-radius: 20px;
+    }
+
+    .external-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 8px;
+      height: 100%;
+      background: linear-gradient(180deg, #6b7280, #374151, #4b5563);
+      box-shadow: 0 0 40px rgba(107, 114, 128, 0.3);
+    }
+
+    .external-card {
+      background: linear-gradient(145deg, rgba(30, 30, 35, 0.7), rgba(15, 15, 20, 0.9));
+      border: 1px solid rgba(107, 114, 128, 0.3);
+      padding: 3rem;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border-radius: 16px;
+    }
+
+    .external-card:hover {
+      border-color: #9ca3af;
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 30px 60px rgba(107, 114, 128, 0.2);
+    }
+
+    .external-card:hover::after {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .external-card::after {
+      content: 'تأثير خارجي';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      padding: 8px 0;
+      background: linear-gradient(90deg, #4b5563, #6b7280);
       color: white;
       font-weight: 900;
       opacity: 0;
@@ -1163,6 +1216,24 @@
       </div>
     </section>
 
+    <!-- External Actors Section (America & ISIS) -->
+    <section id="external-section" class="max-w-7xl mx-auto fade-in hidden">
+      <div class="text-center mb-12 section-header">
+        <div class="inline-flex items-center gap-3 px-8 py-3 bg-black border border-gray-500 text-gray-400 text-xs mb-6 rounded-full">
+          <span class="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></span>
+          EXTERNAL ACTORS
+          <span class="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-black text-gray-300">الكيانات المؤثرة</h2>
+        <p class="text-[var(--muted)] text-sm mt-4">أدوات خارجية وتأثيرها على المنطقة</p>
+      </div>
+      <div class="external-section">
+        <div class="p-8">
+          <div id="external-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- Evidence Section -->
     <section class="max-w-7xl mx-auto fade-in">
       <div class="text-center mb-12 section-header">
@@ -1258,6 +1329,164 @@
   </div>
 
   <script>
+    // ==========================================
+    // DATA (Embedded for demonstration - can be moved to data.js)
+    // ==========================================
+    
+    const levels = {
+      1: { title: "المحور الأول: دول الاندماج العضوي (التحالف الوجودي)", desc: "تطبيع كامل – علاقات دبلوماسية وعسكرية واقتصادية مفتوحة" },
+      2: { title: "المحور الثاني: دول الارتهان الجغرافي (تبعية القسر والديون)", desc: "علاقات مفروضة بفعل الضغوط والمعاهدات" },
+      3: { title: "المحور الثالث: دول التنسيق الوظيفي (تطبيع الظل والمال)", desc: "تعاون في مجالات محدودة (طاقة، استخبارات، موانئ)" },
+      4: { title: "المحور الرابع: دول الحصانة الشعبية (خندق الرفض القانوني)", desc: "موقف رسمي رافض، مقاطعة سياسية واقتصادية" },
+      5: { title: "المحور الخامس: دول الصدام والسيادة (محور المواجهة المفتوحة)", desc: "دعم المقاومة، مواجهة عسكرية مفتوحة" }
+    };
+
+    const countriesData = [
+      // ===== المستوى 1 (مثال) =====
+      {
+        id: 1,
+        name: "الإمارات العربية المتحدة",
+        level: 1,
+        subtitle: "الشريك الاستراتيجي الأوثق",
+        events: `أحداث التطبيع الإماراتي مع إسرائيل
+1. اتفاقية أبراهام (2020)
+الحدث: تطبيع العلاقات الدبلوماسية والاقتصادية والأمنية مع الكيان الصهيوني.
+
+الأثر على العرب: كسر الحاجز النفسي والسياسي، فتح الباب لتطبيع دول خليجية أخرى.
+
+التفاصيل: تم التوقيع في البيت الأبيض بحضور ترامب ونتنياهو.
+`
+      },
+      {
+        id: 2,
+        name: "البحرين",
+        level: 1,
+        subtitle: "التطبيع الخليجي الثاني",
+        events: `انضمام البحرين لاتفاقية أبراهام
+الحدث: توقيع اتفاقية سلام مع إسرائيل بعد الإمارات مباشرة.
+
+الأثر على العرب: تعزيز المحور الموالي للغرب في مواجهة إيران.`
+      },
+
+      // ===== المستوى 5 (إيران مع لبنان وسوريا) =====
+      {
+        id: 10,
+        name: "لبنان",
+        level: 5,
+        subtitle: "جبهة المقاومة الجنوبية",
+        events: `دور لبنان في الصراع
+1. حرب تموز 2006
+الحدث: انتصار حزب الله في مواجهة الجيش الإسرائيلي.
+
+الأثر على العرب: تغير موازين الردع في المنطقة.`
+      },
+      {
+        id: 11,
+        name: "سوريا",
+        level: 5,
+        subtitle: "سورية الصمود والتحدي",
+        events: `الموقف السوري
+1. رفض التطبيع المستمر
+الحدث: رفض سوريا لأي علاقات مع الكيان الصهيوني دعماً للقضية الفلسطينية.`
+      },
+      // === إيران (المضافة حديثاً) ===
+      {
+        id: 50,
+        name: "إيران",
+        level: 5,
+        subtitle: "محور الدعم والمقاومة",
+        events: `مواقف إيران من القضية الفلسطينية والكيان الصهيوني
+1. الثورة الإسلامية (1979)
+الحدث: قطع العلاقات مع إسرائيل وسحب السفير وتسليم السفارة الإسرائيلية في طهران للفلسطينيين.
+
+التفاصيل: تحول الموقف الإيراني من حليف لإسرائيل في عهد الشاه إلى عدو وجودي لها.
+
+الأثر على العرب: تأسيس محور مقاومة جديد في المنطقة.
+
+2. الدعم العسكري للمقاومة
+الحدث: تزويد حزب الله وحماس والجهاد الإسلامي بالتمويل والسلاح والتدريب.
+
+الأثر على العرب: تغير موازين القوى في مواجهة الكيان الصهيوني.
+
+3. برنامج الصواريخ الباليستية
+الحدث: تطوير ترسانة صاروخية قادرة على الوصول لعمق الكيان.
+
+التفاصيل: ردع إسرائيل عن ضرب إيران مباشرة لسنوات.`
+      },
+
+      // ===== فلسطين (قسم خاص) =====
+      {
+        id: 100,
+        name: "فلسطين",
+        subtitle: "The Core of the Cause",
+        events: `ملف القضية الفلسطينية
+1. النكبة (1948)
+الحدث: تهجير أكثر من 700 ألف فلسطيني وتدمير أكثر من 500 قرية.
+
+2. الانتفاضات والصمود
+الحدث: انتفاضة الحجارة (1987) والانتفاضة الثانية (2000).`
+      },
+
+      // ===== السيادة المخطوفة (قسم خاص) =====
+      {
+        id: 101,
+        name: "السيادة المخطوفة",
+        subtitle: "ثمن السلام: استقلال أم تبعية؟",
+        events: `تحليل السياسات الإقليمية
+1. معاهدات السلام المنقوصة
+الحدث: كامب ديفيد مع مصر وأوسلو مع الفلسطينيين.
+
+الأثر: سلام بارد وتعاون أمني مقابل استقلال شكلي.`
+      },
+
+      // ===== الكيانات المؤثرة (أمريكا وداعش) =====
+      {
+        id: 200,
+        name: "أمريكا",
+        subtitle: "أمريكا من دولة عظمى إلى أداة تنفيذ صهيونية",
+        events: `الدور الأمريكي في دعم الكيان الصهيوني
+1. الاعتراف بالقدس عاصمة (2018)
+الحدث: نقل السفارة الأمريكية إلى القدس.
+
+الأثر على العرب: ضربة لصالح القانون الدولي وقرارات الأمم المتحدة.
+
+2. صفقة القرن (2020)
+الحدث: خطة أمريكية لتصفية القضية الفلسطينية.
+
+التفاصيل: محاولة شرعنة الاستيطان وضم الأراضي.
+
+3. الفيتو المتواصل
+الحدث: استخدام الولايات المتحدة لحق النقض (الفيتو) عشرات المرات لحماية إسرائيل في مجلس الأمن.
+
+الرابط: غير محدد`
+      },
+      {
+        id: 201,
+        name: "داعش",
+        subtitle: "أداة التفكيك والتدمير",
+        events: `دور داعش في المنطقة
+1. الظهور في العراق وسوريا (2014)
+الحدث: السيطرة على مساحات واسعة وإعلان "الخلافة".
+
+الأثر على العرب: تشتيت الجيوش العربية وصرف الانتباه عن القضية الفلسطينية.
+
+2. عدم استهداف إسرائيل
+الحدث: لم تسجل أي عملية هجومية جادة لداعش ضد الكيان الصهيوني رغم قربها من الحدود.
+
+التفاصيل: تقارير استخباراتية تشير إلى علاقات غير مباشرة وتحالف مصالح غير معلن.
+
+3. تفكيك الدول العربية
+الحدث: تدمير البنى التحتية في العراق وسوريا وليبيا.
+
+الأثر: إضعاف الدول القومية لصالح تفتيت المنطقة.`
+      }
+    ];
+
+
+    // ==========================================
+    // LOGIC
+    // ==========================================
+
     // Initialize Particles
     (function initParticles() {
       const container = document.getElementById('particles');
@@ -1280,11 +1509,12 @@
 
     // Main App
     (function() {
+      // Check if data exists
       if (typeof levels === 'undefined' || typeof countriesData === 'undefined') {
         document.getElementById('app-container').innerHTML = `
           <div class="text-center text-red-500 p-10 border border-red-500/30 bg-red-500/5 rounded-2xl">
             <h3 class="font-bold text-xl mb-3">خطأ في تحميل البيانات</h3>
-            <p class="text-[var(--muted)]">تأكد من وجود ملف <code class="px-2 py-1 bg-black rounded">data.js</code> في نفس المجلد.</p>
+            <p class="text-[var(--muted)]">تأكد من وجود ملف البيانات.</p>
           </div>`;
         return;
       }
@@ -1293,6 +1523,7 @@
         const container = document.getElementById('app-container');
         container.innerHTML = '';
 
+        // Render Levels 1-5
         for (let i = 1; i <= 5; i++) {
           const levelInfo = levels[i];
           const levelCountries = countriesData.filter(c => c.level === i);
@@ -1319,8 +1550,11 @@
           container.appendChild(section);
         }
 
+        // Render Special Sections
         renderSpecialSection('palestine', 'palestine-section', 'palestine-grid', 'palestine-card');
         renderSpecialSection('sovereignty', 'sovereignty-section', 'sovereignty-grid', 'sovereignty-card');
+        // NEW: Render External Actors (America, ISIS)
+        renderSpecialSection('external', 'external-section', 'external-grid', 'external-card');
 
         animateItems();
       }
@@ -1349,9 +1583,12 @@
       function renderSpecialSection(type, sectionId, gridId, cardClass) {
         let items = [];
         if (type === 'palestine') {
-          items = countriesData.filter(c => c.name.includes("فلسطين") || c.id === 100);
+          items = countriesData.filter(c => c.id === 100);
         } else if (type === 'sovereignty') {
-          items = countriesData.filter(c => c.name.includes("السيادة") || c.id === 101);
+          items = countriesData.filter(c => c.id === 101);
+        } else if (type === 'external') {
+          // Filter for America and ISIS
+          items = countriesData.filter(c => c.id === 200 || c.id === 201);
         }
 
         const sectionContainer = document.getElementById(sectionId);
@@ -1359,10 +1596,16 @@
 
         if (items.length > 0) {
           sectionContainer.classList.remove('hidden');
+          
+          let cardColorStyle = '';
+          if (type === 'palestine') cardColorStyle = 'color: var(--accent-gold); text-shadow: 0 0 30px rgba(212,175,55,0.5);';
+          else if (type === 'sovereignty') cardColorStyle = 'color: var(--accent-purple); text-shadow: 0 0 30px rgba(138,43,226,0.5);';
+          else if (type === 'external') cardColorStyle = 'color: #9ca3af; text-shadow: 0 0 20px rgba(156,163,175,0.3);';
+
           gridContainer.innerHTML = items.map(item => `
             <div class="${cardClass} stagger-item" onclick="openModal(${item.id})" role="button" tabindex="0">
-              <h3 class="text-3xl font-black mb-3" style="color: var(--accent-purple); text-shadow: 0 0 30px rgba(138,43,226,0.5);">${item.name}</h3>
-              ${item.subtitle ? `<p class="text-base text-purple-300 mb-6">${item.subtitle}</p>` : ''}
+              <h3 class="text-3xl font-black mb-3" style="${cardColorStyle}">${item.name}</h3>
+              ${item.subtitle ? `<p class="text-base text-gray-400 mb-6">${item.subtitle}</p>` : ''}
               <p class="text-xs text-[var(--muted)] uppercase tracking-widest">اضغط لفتح الملف التفاعلي</p>
             </div>
           `).join('');
@@ -1397,7 +1640,13 @@
 
         const modal = document.getElementById('detail-modal');
         const body = document.getElementById('modal-body');
-        const levelColor = getLevelColor(country.level || 100, 'hex');
+        
+        // Determine color
+        let levelColor = '#149954';
+        if (country.level) levelColor = getLevelColor(country.level, 'hex');
+        else if (country.id === 100) levelColor = '#D4AF37';
+        else if (country.id === 101) levelColor = '#8A2BE2';
+        else if (country.id === 200 || country.id === 201) levelColor = '#6b7280';
 
         let eventsHtml = '';
         if (country.events && country.events.trim()) {
@@ -1413,30 +1662,13 @@
               <div class="flex items-center gap-3 mb-3">
                 <span class="w-3 h-3 rounded-full animate-pulse" style="background: ${levelColor}; box-shadow: 0 0 20px ${levelColor}"></span>
                 <span class="text-xs font-bold uppercase tracking-[0.2em]" style="color: ${levelColor}">
-                  ${country.level ? (levels[country.level] ? levels[country.level].title.split(':')[0] : 'ملف خاص') : 'ملف خاص'}
+                  ${country.level ? (levels[country.level] ? levels[country.level].title.split(':')[0] : 'ملف خاص') : 'كيان مؤثر'}
                 </span>
               </div>
               <h2 class="text-4xl md:text-5xl font-black mb-3">${country.name}</h2>
               ${country.subtitle ? `<p class="text-xl neon-text">${country.subtitle}</p>` : ''}
             </div>
             <div class="space-y-0">${eventsHtml}</div>
-            ${country.links && country.links.length ? `
-              <div class="mt-12 pt-8 border-t border-[var(--border)]">
-                <h4 class="text-xs font-bold text-[var(--muted)] mb-6 uppercase tracking-[0.15em]">روابط ذات صلة</h4>
-                <div class="flex flex-wrap gap-4">
-                  ${country.links.map(link => `
-                    <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm bg-black px-5 py-3 border border-[var(--accent)] hover:bg-[var(--accent)] hover:text-black transition-all rounded-full">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                      </svg>
-                      ${link.name}
-                    </a>
-                  `).join('')}
-                </div>
-              </div>
-            ` : ''}
           </div>
         `;
 
