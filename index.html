@@ -429,6 +429,46 @@
     .label-link { color: #fbbf24; font-weight: 700; }
     .label-source { color: #f87171; font-weight: 500; font-size: 0.9em; }
 
+    /* BTC Modal Styles (Added/Fixed) */
+    .btc-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(20px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btc-modal-overlay.active { opacity: 1; visibility: visible; }
+    .btc-modal-content {
+      background: linear-gradient(145deg, #0a0a0a, #151515);
+      border: 2px solid var(--accent-gold);
+      border-radius: 24px;
+      max-width: 480px;
+      width: 100%;
+      padding: 3rem;
+      text-align: center;
+      box-shadow: 0 0 80px rgba(212, 175, 55, 0.3);
+      transform: scale(0.8) translateY(50px);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .btc-modal-overlay.active .btc-modal-content { transform: scale(1) translateY(0); }
+    .close-btc-modal {
+      position: absolute; top: 15px; left: 15px;
+      background: rgba(255,255,255,0.1); border: none;
+      color: #666; font-size: 1.5rem; cursor: pointer;
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .close-btc-modal:hover { color: white; background: var(--accent-red); }
+
     .modal-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; }
     .modal-table th { background: linear-gradient(180deg, rgba(20, 153, 84, 0.3), rgba(20, 153, 84, 0.1)); color: var(--accent); font-weight: 700; padding: 0.75rem 0.5rem; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
     .modal-table td { padding: 0.75rem 0.5rem; border: 1px solid rgba(255,255,255,0.05); vertical-align: top; color: #d1d5db; }
@@ -457,12 +497,11 @@
 
   <!-- Navigation Bar -->
   <nav class="main-nav">
-    <button class="nav-btn active" onclick="navigateTo('home')">الرئيسية</button>
-    <button class="nav-btn" onclick="navigateTo('palestine')">فلسطين</button>
-    <button class="nav-btn" onclick="navigateTo('sovereignty')">السيادة المخطوفة</button>
-    <!-- Updated Name Here -->
-    <button class="nav-btn" onclick="navigateTo('external')">الأكاذيب المسيطرة</button>
-    <button class="nav-btn" onclick="navigateTo('evidence')">الأدلة المرئية</button>
+    <button class="nav-btn active" data-page="home" onclick="navigateTo('home')">الرئيسية</button>
+    <button class="nav-btn" data-page="palestine" onclick="navigateTo('palestine')">فلسطين</button>
+    <button class="nav-btn" data-page="sovereignty" onclick="navigateTo('sovereignty')">السيادة المخطوفة</button>
+    <button class="nav-btn" data-page="external" onclick="navigateTo('external')">الأكاذيب المسيطرة</button>
+    <button class="nav-btn" data-page="evidence" onclick="navigateTo('evidence')">الأدلة المرئية</button>
   </nav>
 
   <!-- Coffee Button -->
@@ -548,12 +587,10 @@
     <div id="page-external" class="page-view">
       <div class="max-w-7xl mx-auto">
         <div class="text-center mb-12 section-header fade-in">
-          <!-- Updated Title and Description -->
           <h2 class="text-4xl md:text-5xl font-black text-gray-300">الأكاذيب المسيطرة</h2>
           <p class="text-[var(--muted)] text-sm mt-4">أشياء جعلونا نؤمن بها وليست حقيقية، أدوات تحكم خفية تتحكم بمصيرنا</p>
         </div>
         <div class="external-section fade-in">
-          <!-- Grid set to 2 columns on medium screens and 3 on large to accommodate more buttons -->
           <div id="external-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
       </div>
@@ -601,36 +638,37 @@
   </div>
 
   <!-- BTC Modal -->
-  <div id="btcModal" class="btc-modal-overlay" onclick="closeBTCModalOnBackdrop(event)" style="z-index: 110;">
-    <div class="btc-modal-content bg-gray-900 border-gray-700 p-8 text-center" onclick="event.stopPropagation()">
+  <div id="btcModal" class="btc-modal-overlay" onclick="closeBTCModalOnBackdrop(event)">
+    <div class="btc-modal-content" onclick="event.stopPropagation()">
       <button class="close-btc-modal" onclick="closeBTCModal()">×</button>
       <h2 class="text-2xl font-black mb-2 text-[var(--accent-gold)]">Support the Project</h2>
       <p class="text-gray-400 mb-6 text-sm">Bitcoin address</p>
-      <div class="btc-address-box bg-black border-gray-700 p-4 rounded-lg text-yellow-500 text-xs break-all mb-4">
+      <div class="btc-address-box bg-black border border-gray-700 p-4 rounded-lg text-yellow-500 text-xs break-all mb-4">
         bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4
       </div>
-      <button class="copy-btn bg-yellow-600 text-black px-6 py-2 rounded-full font-bold" onclick="copyBTC()">Copy Address</button>
+      <button class="copy-btn bg-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:bg-yellow-500 transition" onclick="copyBTC()">Copy Address</button>
     </div>
   </div>
 
   <script>
     // Navigation Logic
     function navigateTo(pageId) {
+      // Hide all pages
       document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
       
+      // Deactivate all buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+      // Show target page
       const targetPage = document.getElementById(`page-${pageId}`);
       if (targetPage) {
         targetPage.classList.add('active');
-        window.scrollTo(0, 0);
+        window.scrollTo(0, 0); // Scroll to top on page change
       }
 
-      const buttons = document.querySelectorAll('.nav-btn');
-      buttons.forEach(btn => {
-        if (btn.onclick.toString().includes(`'${pageId}'`)) {
-          btn.classList.add('active');
-        }
-      });
+      // Activate corresponding button using data-page attribute
+      const activeBtn = document.querySelector(`.nav-btn[data-page="${pageId}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
     }
 
     // Init Particles
