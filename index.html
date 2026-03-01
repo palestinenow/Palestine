@@ -14,6 +14,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
+  <!-- Data File -->
+  <script src="data.js"></script>
+
   <style>
     :root {
       --bg: #050505;
@@ -641,10 +644,23 @@
       border-radius: 16px;
     }
 
+    .palestine-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
     .palestine-card:hover {
       border-color: var(--accent-gold);
       transform: translateY(-10px) scale(1.02);
       box-shadow: 0 30px 60px rgba(212, 175, 55, 0.2);
+    }
+
+    .palestine-card:hover::before {
+      opacity: 1;
     }
 
     .palestine-card:hover::after {
@@ -1329,164 +1345,6 @@
   </div>
 
   <script>
-    // ==========================================
-    // DATA (Embedded for demonstration - can be moved to data.js)
-    // ==========================================
-    
-    const levels = {
-      1: { title: "المحور الأول: دول الاندماج العضوي (التحالف الوجودي)", desc: "تطبيع كامل – علاقات دبلوماسية وعسكرية واقتصادية مفتوحة" },
-      2: { title: "المحور الثاني: دول الارتهان الجغرافي (تبعية القسر والديون)", desc: "علاقات مفروضة بفعل الضغوط والمعاهدات" },
-      3: { title: "المحور الثالث: دول التنسيق الوظيفي (تطبيع الظل والمال)", desc: "تعاون في مجالات محدودة (طاقة، استخبارات، موانئ)" },
-      4: { title: "المحور الرابع: دول الحصانة الشعبية (خندق الرفض القانوني)", desc: "موقف رسمي رافض، مقاطعة سياسية واقتصادية" },
-      5: { title: "المحور الخامس: دول الصدام والسيادة (محور المواجهة المفتوحة)", desc: "دعم المقاومة، مواجهة عسكرية مفتوحة" }
-    };
-
-    const countriesData = [
-      // ===== المستوى 1 (مثال) =====
-      {
-        id: 1,
-        name: "الإمارات العربية المتحدة",
-        level: 1,
-        subtitle: "الشريك الاستراتيجي الأوثق",
-        events: `أحداث التطبيع الإماراتي مع إسرائيل
-1. اتفاقية أبراهام (2020)
-الحدث: تطبيع العلاقات الدبلوماسية والاقتصادية والأمنية مع الكيان الصهيوني.
-
-الأثر على العرب: كسر الحاجز النفسي والسياسي، فتح الباب لتطبيع دول خليجية أخرى.
-
-التفاصيل: تم التوقيع في البيت الأبيض بحضور ترامب ونتنياهو.
-`
-      },
-      {
-        id: 2,
-        name: "البحرين",
-        level: 1,
-        subtitle: "التطبيع الخليجي الثاني",
-        events: `انضمام البحرين لاتفاقية أبراهام
-الحدث: توقيع اتفاقية سلام مع إسرائيل بعد الإمارات مباشرة.
-
-الأثر على العرب: تعزيز المحور الموالي للغرب في مواجهة إيران.`
-      },
-
-      // ===== المستوى 5 (إيران مع لبنان وسوريا) =====
-      {
-        id: 10,
-        name: "لبنان",
-        level: 5,
-        subtitle: "جبهة المقاومة الجنوبية",
-        events: `دور لبنان في الصراع
-1. حرب تموز 2006
-الحدث: انتصار حزب الله في مواجهة الجيش الإسرائيلي.
-
-الأثر على العرب: تغير موازين الردع في المنطقة.`
-      },
-      {
-        id: 11,
-        name: "سوريا",
-        level: 5,
-        subtitle: "سورية الصمود والتحدي",
-        events: `الموقف السوري
-1. رفض التطبيع المستمر
-الحدث: رفض سوريا لأي علاقات مع الكيان الصهيوني دعماً للقضية الفلسطينية.`
-      },
-      // === إيران (المضافة حديثاً) ===
-      {
-        id: 50,
-        name: "إيران",
-        level: 5,
-        subtitle: "محور الدعم والمقاومة",
-        events: `مواقف إيران من القضية الفلسطينية والكيان الصهيوني
-1. الثورة الإسلامية (1979)
-الحدث: قطع العلاقات مع إسرائيل وسحب السفير وتسليم السفارة الإسرائيلية في طهران للفلسطينيين.
-
-التفاصيل: تحول الموقف الإيراني من حليف لإسرائيل في عهد الشاه إلى عدو وجودي لها.
-
-الأثر على العرب: تأسيس محور مقاومة جديد في المنطقة.
-
-2. الدعم العسكري للمقاومة
-الحدث: تزويد حزب الله وحماس والجهاد الإسلامي بالتمويل والسلاح والتدريب.
-
-الأثر على العرب: تغير موازين القوى في مواجهة الكيان الصهيوني.
-
-3. برنامج الصواريخ الباليستية
-الحدث: تطوير ترسانة صاروخية قادرة على الوصول لعمق الكيان.
-
-التفاصيل: ردع إسرائيل عن ضرب إيران مباشرة لسنوات.`
-      },
-
-      // ===== فلسطين (قسم خاص) =====
-      {
-        id: 100,
-        name: "فلسطين",
-        subtitle: "The Core of the Cause",
-        events: `ملف القضية الفلسطينية
-1. النكبة (1948)
-الحدث: تهجير أكثر من 700 ألف فلسطيني وتدمير أكثر من 500 قرية.
-
-2. الانتفاضات والصمود
-الحدث: انتفاضة الحجارة (1987) والانتفاضة الثانية (2000).`
-      },
-
-      // ===== السيادة المخطوفة (قسم خاص) =====
-      {
-        id: 101,
-        name: "السيادة المخطوفة",
-        subtitle: "ثمن السلام: استقلال أم تبعية؟",
-        events: `تحليل السياسات الإقليمية
-1. معاهدات السلام المنقوصة
-الحدث: كامب ديفيد مع مصر وأوسلو مع الفلسطينيين.
-
-الأثر: سلام بارد وتعاون أمني مقابل استقلال شكلي.`
-      },
-
-      // ===== الكيانات المؤثرة (أمريكا وداعش) =====
-      {
-        id: 200,
-        name: "أمريكا",
-        subtitle: "أمريكا من دولة عظمى إلى أداة تنفيذ صهيونية",
-        events: `الدور الأمريكي في دعم الكيان الصهيوني
-1. الاعتراف بالقدس عاصمة (2018)
-الحدث: نقل السفارة الأمريكية إلى القدس.
-
-الأثر على العرب: ضربة لصالح القانون الدولي وقرارات الأمم المتحدة.
-
-2. صفقة القرن (2020)
-الحدث: خطة أمريكية لتصفية القضية الفلسطينية.
-
-التفاصيل: محاولة شرعنة الاستيطان وضم الأراضي.
-
-3. الفيتو المتواصل
-الحدث: استخدام الولايات المتحدة لحق النقض (الفيتو) عشرات المرات لحماية إسرائيل في مجلس الأمن.
-
-الرابط: غير محدد`
-      },
-      {
-        id: 201,
-        name: "داعش",
-        subtitle: "أداة التفكيك والتدمير",
-        events: `دور داعش في المنطقة
-1. الظهور في العراق وسوريا (2014)
-الحدث: السيطرة على مساحات واسعة وإعلان "الخلافة".
-
-الأثر على العرب: تشتيت الجيوش العربية وصرف الانتباه عن القضية الفلسطينية.
-
-2. عدم استهداف إسرائيل
-الحدث: لم تسجل أي عملية هجومية جادة لداعش ضد الكيان الصهيوني رغم قربها من الحدود.
-
-التفاصيل: تقارير استخباراتية تشير إلى علاقات غير مباشرة وتحالف مصالح غير معلن.
-
-3. تفكيك الدول العربية
-الحدث: تدمير البنى التحتية في العراق وسوريا وليبيا.
-
-الأثر: إضعاف الدول القومية لصالح تفتيت المنطقة.`
-      }
-    ];
-
-
-    // ==========================================
-    // LOGIC
-    // ==========================================
-
     // Initialize Particles
     (function initParticles() {
       const container = document.getElementById('particles');
@@ -1509,12 +1367,11 @@
 
     // Main App
     (function() {
-      // Check if data exists
       if (typeof levels === 'undefined' || typeof countriesData === 'undefined') {
         document.getElementById('app-container').innerHTML = `
           <div class="text-center text-red-500 p-10 border border-red-500/30 bg-red-500/5 rounded-2xl">
             <h3 class="font-bold text-xl mb-3">خطأ في تحميل البيانات</h3>
-            <p class="text-[var(--muted)]">تأكد من وجود ملف البيانات.</p>
+            <p class="text-[var(--muted)]">تأكد من وجود ملف <code class="px-2 py-1 bg-black rounded">data.js</code> في نفس المجلد.</p>
           </div>`;
         return;
       }
@@ -1523,7 +1380,7 @@
         const container = document.getElementById('app-container');
         container.innerHTML = '';
 
-        // Render Levels 1-5
+        // Render Levels 1-5 (This keeps all original countries)
         for (let i = 1; i <= 5; i++) {
           const levelInfo = levels[i];
           const levelCountries = countriesData.filter(c => c.level === i);
@@ -1583,9 +1440,9 @@
       function renderSpecialSection(type, sectionId, gridId, cardClass) {
         let items = [];
         if (type === 'palestine') {
-          items = countriesData.filter(c => c.id === 100);
+          items = countriesData.filter(c => c.name.includes("فلسطين") || c.id === 100);
         } else if (type === 'sovereignty') {
-          items = countriesData.filter(c => c.id === 101);
+          items = countriesData.filter(c => c.name.includes("السيادة") || c.id === 101);
         } else if (type === 'external') {
           // Filter for America and ISIS
           items = countriesData.filter(c => c.id === 200 || c.id === 201);
@@ -1669,6 +1526,23 @@
               ${country.subtitle ? `<p class="text-xl neon-text">${country.subtitle}</p>` : ''}
             </div>
             <div class="space-y-0">${eventsHtml}</div>
+            ${country.links && country.links.length ? `
+              <div class="mt-12 pt-8 border-t border-[var(--border)]">
+                <h4 class="text-xs font-bold text-[var(--muted)] mb-6 uppercase tracking-[0.15em]">روابط ذات صلة</h4>
+                <div class="flex flex-wrap gap-4">
+                  ${country.links.map(link => `
+                    <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm bg-black px-5 py-3 border border-[var(--accent)] hover:bg-[var(--accent)] hover:text-black transition-all rounded-full">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                      </svg>
+                      ${link.name}
+                    </a>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
           </div>
         `;
 
