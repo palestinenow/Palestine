@@ -258,4 +258,24 @@ const countriesData = [
     subtitle: "The Day That Changed Everything",
     events: `أحداث 11 سبتمبر
 1. تغيير مسار العالم
-الحدث: استخدام الحدث
+الحدث: استخدام الحدث لغزو الدول العربية.`
+  },
+  {
+    id: 203,
+    name: "مسرحية الكائنات الفضائية",
+    subtitle: "Project Blue Beam",
+    events: `ملف الكائنات الفضائية
+1. التضليل الإعلامي
+الحدث: تسريبات متكررة عن أجسام غامضة.`
+  },
+  {
+    id: 204,
+    name: "The Illusion of Absolute Power",
+    subtitle: "وهم القوة المطلقة",
+    events: `تحليل القوة
+1. القوة الزائفة
+الحدث: الدول العظمى التي تبدو قوية لكنها مرتبطة بمصالح خفية.`
+  }
+];
+
+const bigEventsData = [];
