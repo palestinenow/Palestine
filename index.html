@@ -3,859 +3,399 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تاريخ الدول العربية | وثيقة التطبيع</title>
-  <meta name="description" content="وثيقة تفاعلية توثيقية شاملة لمواقف الدول العربية من الكيان الصهيوني وقضية فلسطين.">
-  
-  <!-- Tailwind CSS -->
+  <title>وثيقة التطبيع | SYSTEM ONLINE</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-
-  <!-- Data File -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
   <script src="data.js"></script>
 
   <style>
     :root {
-      --bg: #050505;
-      --bg-card: #0a0a0a;
-      --fg: #ffffff;
+      --bg: #000000;
+      --card-bg: rgba(10, 10, 10, 0.85);
+      --text: #ffffff;
       --muted: #888888;
+      --green: #00FF41; /* Matrix Green */
       --accent: #149954; /* Palestine Green */
-      --accent-red: #E4312B;
-      --accent-gold: #D4AF37;
-      --accent-purple: #8A2BE2;
-      --accent-blue: #2563eb;
-      --border: #1a1a1a;
-      --matrix-green: #00FF41;
+      --red: #E4312B;
+      --gold: #D4AF37;
+      --purple: #8A2BE2;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Tajawal', sans-serif;
       background-color: var(--bg);
-      color: var(--fg);
+      color: var(--text);
       overflow-x: hidden;
-      line-height: 1.6;
-      cursor: none; /* Hide default cursor for matrix effect */
-    }
-
-    /* Mobile Cursor Fix */
-    @media (pointer: coarse) {
-      body { cursor: auto; }
-      .matrix-cursor { display: none; }
-    }
-
-    /* Matrix Canvas Background */
-    #matrix-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -3;
-      pointer-events: none;
-    }
-
-    /* Matrix Cursor */
-    .matrix-cursor {
-      position: fixed;
-      width: 20px;
-      height: 20px;
-      border: 1px solid var(--matrix-green);
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      z-index: 10000;
-      box-shadow: 0 0 15px var(--matrix-green);
-      transition: transform 0.1s ease;
-      mix-blend-mode: difference;
-    }
-
-    /* Palestine Flag Gradient Top Bar */
-    .palestine-gradient {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 6px;
-      background: linear-gradient(90deg, 
-        #000 0%, #000 25%, 
-        #fff 25%, #fff 50%, 
-        var(--accent) 50%, var(--accent) 75%, 
-        var(--accent-red) 75%, var(--accent-red) 100%);
-      z-index: 9999;
-      animation: flagPulse 3s ease-in-out infinite;
-    }
-
-    @keyframes flagPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    /* News Ticker */
-    .ticker-wrap {
-      position: fixed;
-      top: 6px; left: 0;
-      width: 100%;
-      overflow: hidden;
-      background: rgba(0, 0, 0, 0.95);
-      border-bottom: 1px solid var(--border);
-      z-index: 50;
-      font-size: 0.7rem;
-      padding: 8px 0;
-    }
-
-    .ticker {
-      display: flex;
-      white-space: nowrap;
-      animation: ticker 40s linear infinite;
-    }
-
-    .ticker-item {
-      padding: 0 2rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .ticker-item::before {
-      content: '';
-      width: 6px; height: 6px;
-      background: var(--matrix-green);
-      border-radius: 50%;
-      animation: blink 1s infinite;
-    }
-
-    @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-    /* Navigation Bar */
-    .main-nav {
-      position: fixed;
-      top: 38px; left: 0;
-      width: 100%;
-      z-index: 45;
-      background: rgba(5, 5, 5, 0.95);
-      backdrop-filter: blur(15px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 1rem;
-      display: flex;
-      justify-content: center; /* Center on desktop */
-      gap: 0.5rem;
-      overflow-x: auto; /* Scroll on mobile */
-      scrollbar-width: none;
-    }
-    .main-nav::-webkit-scrollbar { display: none; }
-
-    .nav-btn {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      padding: 1rem 1.5rem;
-      font-family: 'Tajawal', sans-serif;
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border-bottom: 3px solid transparent;
-      white-space: nowrap;
-    }
-
-    .nav-btn:hover { color: var(--fg); background: rgba(255,255,255,0.05); }
-    .nav-btn.active { color: var(--matrix-green); border-bottom-color: var(--matrix-green); }
-
-    /* Page Container Logic */
-    .page-view {
-      display: none;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-      padding-top: 100px; /* Space for Nav + Ticker */
       min-height: 100vh;
     }
 
-    .page-view.active {
-      display: block;
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Flag Stripe Bottom */
-    .flag-stripe {
+    /* --- Matrix Canvas Background --- */
+    #matrix-bg {
       position: fixed;
-      bottom: 0; left: 0;
-      width: 100%; height: 5px;
-      background: linear-gradient(90deg, #000 0%, #000 33%, #fff 33%, #fff 66%, var(--accent) 66%, var(--accent) 100%);
-      z-index: 9999;
-    }
-    .flag-stripe::before {
-      content: '';
-      position: absolute; left: 0; top: 0;
-      width: 20%; height: 100%;
-      background: var(--accent-red);
-      clip-path: polygon(0 0, 100% 50%, 0 100%);
-    }
-
-    /* Coffee Button */
-    .coffee-button {
-      position: fixed;
-      bottom: 30px; left: 20px;
-      z-index: 9999;
-      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-      border: 1px solid var(--accent-gold);
-      border-radius: 50px;
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-      transition: all 0.3s ease;
-      font-weight: 700; font-size: 0.8rem;
-      color: var(--accent-gold);
-    }
-    .coffee-button:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(212,175,55,0.3); }
-
-    /* Level Sections & Cards */
-    .level-section {
-      position: relative;
-      border: 1px solid var(--border);
-      background: rgba(10, 10, 10, 0.8); /* Darker bg for matrix visibility */
-      backdrop-filter: blur(10px);
-      margin-bottom: 3rem;
-      overflow: hidden;
-      border-radius: 16px;
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .level-section::before {
-      content: '';
-      position: absolute; top: 0; right: 0;
-      width: 4px; height: 100%;
-      transition: all 0.4s ease;
-    }
-    .level-section:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); border-color: rgba(0, 255, 65, 0.2); }
-    .level-section:hover::before { width: 8px; box-shadow: 0 0 30px currentColor; }
-
-    .level-1::before { background: linear-gradient(180deg, #059669, #10b981); color: #059669; }
-    .level-2::before { background: linear-gradient(180deg, #0891b2, #06b6d4); color: #0891b2; }
-    .level-3::before { background: linear-gradient(180deg, #d97706, #f59e0b); color: #d97706; }
-    .level-4::before { background: linear-gradient(180deg, #2563eb, #3b82f6); color: #2563eb; }
-    .level-5::before { background: linear-gradient(180deg, #dc2626, #ef4444); color: #dc2626; }
-
-    .country-card, .palestine-card, .sovereignty-card, .external-card {
-      background: rgba(15, 15, 15, 0.6);
-      border: 1px solid rgba(0, 255, 65, 0.1);
-      padding: 1.5rem;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      border-radius: 12px;
-      min-height: 180px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .country-card:hover, .palestine-card:hover, .sovereignty-card:hover, .external-card:hover {
-      border-color: var(--matrix-green);
-      transform: translateY(-5px) scale(1.01);
-      box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-    }
-
-    /* Section Specific Styles */
-    .palestine-section { border-color: rgba(212, 175, 55, 0.4); background: rgba(10,10,10, 0.8); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; }
-    .sovereignty-section { border-color: rgba(138, 43, 226, 0.4); background: rgba(10,10,10, 0.8); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; }
-    .external-section { border-color: rgba(107, 114, 128, 0.4); background: rgba(10,10,10, 0.8); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; }
-    .evidence-section { border-color: rgba(37, 99, 235, 0.4); background: rgba(10,10,10, 0.8); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0, 0, 0, 0.97);
-      backdrop-filter: blur(30px);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .modal-overlay.active { opacity: 1; visibility: visible; }
-    .modal-content {
-      background: #0a0a0a;
-      border: 1px solid var(--matrix-green);
-      width: 100%; max-width: 900px; max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-      box-shadow: 0 0 50px rgba(0, 255, 65, 0.2);
-      transform: scale(0.9) translateY(30px);
-      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 16px;
-    }
-    .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
-
-    .data-body-text { font-size: 1rem; line-height: 2; color: #d1d5db; margin-top: 0.5rem; text-align: justify; }
-    .label-event { color: #34d399; font-weight: 700; }
-    .label-impact { color: #60a5fa; font-weight: 700; }
-    .label-link { color: #fbbf24; font-weight: 700; }
-    .label-source { color: #f87171; font-weight: 500; font-size: 0.9em; }
-
-    /* BTC Modal Styles */
-    .btc-modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0, 0, 0, 0.95);
-      backdrop-filter: blur(20px);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .btc-modal-overlay.active { opacity: 1; visibility: visible; }
-    .btc-modal-content {
-      background: linear-gradient(145deg, #0a0a0a, #151515);
-      border: 2px solid var(--accent-gold);
-      border-radius: 24px;
-      max-width: 480px;
-      width: 100%;
-      padding: 3rem;
-      text-align: center;
-      box-shadow: 0 0 80px rgba(212, 175, 55, 0.3);
-      transform: scale(0.8) translateY(50px);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    .btc-modal-overlay.active .btc-modal-content { transform: scale(1) translateY(0); }
-    .close-btc-modal {
-      position: absolute; top: 15px; left: 15px;
-      background: rgba(255,255,255,0.1); border: none;
-      color: #666; font-size: 1.5rem; cursor: pointer;
-      width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.3s ease;
-    }
-    .close-btc-modal:hover { color: white; background: var(--accent-red); }
-
-    .links-list {
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-    }
-    .links-list h4 { color: var(--matrix-green); font-size: 0.9rem; margin-bottom: 0.5rem; }
-    .links-list a {
-      display: block;
-      color: var(--accent-gold);
-      text-decoration: none;
-      padding: 0.25rem 0;
-      transition: color 0.2s;
-    }
-    .links-list a:hover { color: white; text-decoration: underline; }
-
-    /* Animations */
-    .fade-in { animation: fadeIn 1s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-    .stagger-item { opacity: 0; animation: fadeIn 0.6s ease forwards; }
-    
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--matrix-green); border-radius: 3px; }
-
-    /* Home Hero Text Glitch */
-    .glitch-wrapper { position: relative; display: inline-block; }
-    .glitch-text {
-      font-size: clamp(2rem, 8vw, 5rem);
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      position: relative;
-      color: white;
-      text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
-    }
-    .glitch-text::before, .glitch-text::after {
-      content: attr(data-text);
-      position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: var(--bg);
+      z-index: -1;
+      opacity: 0.6;
     }
-    .glitch-text::before {
-      left: 2px;
-      text-shadow: -2px 0 var(--accent-red);
-      clip: rect(44px, 450px, 56px, 0);
-      animation: glitch-anim 4s infinite linear alternate-reverse;
+
+    /* --- Top Header Bar --- */
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, #000 25%, #fff 25%, #fff 50%, var(--accent) 50%, var(--accent) 75%, var(--red) 75%);
+      z-index: 999;
     }
-    .glitch-text::after {
-      left: -2px;
-      text-shadow: 2px 0 var(--matrix-green);
-      clip: rect(44px, 450px, 56px, 0);
-      animation: glitch-anim2 4s infinite linear alternate-reverse;
+
+    /* --- Navigation --- */
+    .nav-container {
+      position: fixed;
+      top: 6px; left: 0; width: 100%;
+      background: rgba(0,0,0,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #222;
+      z-index: 100;
+      padding: 10px 0;
     }
-    @keyframes glitch-anim {
-      0% { clip: rect(31px, 9999px, 94px, 0); }
-      20% { clip: rect(85px, 9999px, 77px, 0); }
-      40% { clip: rect(64px, 9999px, 98px, 0); }
-      60% { clip: rect(99px, 9999px, 114px, 0); }
-      80% { clip: rect(98px, 9999px, 129px, 0); }
-      100% { clip: rect(82px, 9999px, 69px, 0); }
+
+    .nav-scroll {
+      display: flex;
+      overflow-x: auto;
+      justify-content: center; /* Center on desktop */
+      gap: 5px;
+      padding: 0 10px;
+      -webkit-overflow-scrolling: touch; /* Smooth scroll on mobile */
     }
-    @keyframes glitch-anim2 {
-      0% { clip: rect(65px, 9999px, 100px, 0); }
-      20% { clip: rect(79px, 9999px, 85px, 0); }
-      40% { clip: rect(88px, 9999px, 94px, 0); }
-      60% { clip: rect(22px, 9999px, 63px, 0); }
-      80% { clip: rect(69px, 9999px, 62px, 0); }
-      100% { clip: rect(58px, 9999px, 94px, 0); }
+    .nav-scroll::-webkit-scrollbar { display: none; } /* Hide scrollbar */
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid #333;
+      color: var(--muted);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.3s;
+    }
+
+    .nav-btn:hover { color: #fff; border-color: #fff; }
+    .nav-btn.active { background: var(--green); color: #000; border-color: var(--green); }
+
+    /* --- Page Layout --- */
+    .page {
+      display: none;
+      padding: 100px 20px 60px; /* Top padding for nav */
+      max-width: 1200px;
+      margin: 0 auto;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .page.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- Cards --- */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      border-color: var(--green);
+      transform: translateY(-3px);
+      box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+    }
+
+    .card-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 5px; }
+    .card-sub { font-size: 0.85rem; color: var(--muted); }
+
+    /* --- Modal --- */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+    .modal-box {
+      background: #0a0a0a;
+      border: 1px solid var(--green);
+      border-radius: 15px;
+      width: 100%; max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 30px;
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+    .modal-overlay.active .modal-box { transform: scale(1); }
+
+    .close-btn {
+      position: absolute; top: 10px; left: 10px;
+      background: #333; border: none; color: #fff;
+      width: 30px; height: 30px; border-radius: 50%;
+      cursor: pointer; font-weight: bold;
+    }
+
+    /* --- Section Headers --- */
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+      border-right: 4px solid var(--green);
+      padding-right: 15px;
+    }
+    .section-desc { color: var(--muted); margin-bottom: 20px; }
+
+    /* --- Hero (Home) --- */
+    .hero { text-align: center; padding: 50px 0; }
+    .hero h1 { font-size: 3rem; font-weight: 900; text-shadow: 0 0 20px var(--green); margin-bottom: 15px; }
+    .hero p { color: var(--muted); max-width: 600px; margin: 0 auto; }
+
+    /* --- Donate Button --- */
+    .donate-btn {
+      position: fixed; bottom: 20px; left: 20px;
+      background: #000; border: 1px solid var(--gold);
+      color: var(--gold); padding: 10px 20px;
+      border-radius: 30px; font-weight: bold;
+      cursor: pointer; z-index: 50;
+      display: flex; align-items: center; gap: 10px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Matrix Canvas Background -->
-  <canvas id="matrix-canvas"></canvas>
-  
-  <!-- Custom Cursor -->
-  <div class="matrix-cursor" id="cursor"></div>
+  <!-- Matrix Background Canvas -->
+  <canvas id="matrix-bg"></canvas>
 
-  <!-- Palestine Flag Top Bar -->
-  <div class="palestine-gradient"></div>
+  <!-- Top Flag Bar -->
+  <div class="top-bar"></div>
 
-  <!-- Navigation Bar -->
-  <nav class="main-nav">
-    <button class="nav-btn active" data-page="home" onclick="navigateTo('home')">الرئيسية</button>
-    <button class="nav-btn" data-page="countries" onclick="navigateTo('countries')">تاريخ الدول</button>
-    <button class="nav-btn" data-page="palestine" onclick="navigateTo('palestine')">فلسطين</button>
-    <button class="nav-btn" data-page="sovereignty" onclick="navigateTo('sovereignty')">السيادة المخطوفة</button>
-    <button class="nav-btn" data-page="external" onclick="navigateTo('external')">الأكاذيب المسيطرة</button>
-    <button class="nav-btn" data-page="evidence" onclick="navigateTo('evidence')">الأدلة المرئية</button>
+  <!-- Navigation -->
+  <nav class="nav-container">
+    <div class="nav-scroll">
+      <button class="nav-btn active" onclick="showPage('home')">الرئيسية</button>
+      <button class="nav-btn" onclick="showPage('countries')">تاريخ الدول</button>
+      <button class="nav-btn" onclick="showPage('palestine')">فلسطين</button>
+      <button class="nav-btn" onclick="showPage('sovereignty')">السيادة المخطوفة</button>
+      <button class="nav-btn" onclick="showPage('lies')">الأكاذيب المسيطرة</button>
+    </div>
   </nav>
 
-  <!-- Coffee Button -->
-  <div class="coffee-button" onclick="openBTCModal()">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg>
-    <span>Donate</span>
-  </div>
-
-  <!-- News Ticker -->
-  <div class="ticker-wrap">
-    <div class="ticker">
-      <span class="ticker-item" style="color: var(--matrix-green);">SYSTEM ONLINE</span>
-      <span class="ticker-item" style="color: var(--accent-red);">RESISTANCE CONTINUES</span>
-      <span class="ticker-item" style="color: var(--accent-gold);">FROM THE RIVER TO THE SEA</span>
-      <span class="ticker-item" style="color: var(--matrix-green);">PALESTINE WILL BE FREE</span>
-      <span class="ticker-item" style="color: white;">FREE PALESTINE</span>
+  <!-- PAGE: HOME -->
+  <div id="page-home" class="page active">
+    <div class="hero">
+      <h1>SYSTEM://ONLINE</h1>
+      <p>وثيقة تفاعلية متجددة توثق مواقف الدول العربية من القضية الفلسطينية والكيان الصهيوني.</p>
+      <div style="margin-top: 30px;">
+        <span style="border: 1px solid var(--green); padding: 10px 30px; border-radius: 50px; color: var(--green); font-weight: bold; letter-spacing: 2px;">
+          FREE PALESTINE
+        </span>
+      </div>
     </div>
   </div>
 
-  <!-- Flag Stripe Bottom -->
-  <div class="flag-stripe"></div>
-
-  <!-- Main Container -->
-  <div class="min-h-screen px-4 py-8 md:px-8 lg:px-16">
-
-    <!-- PAGE: HOME (Empty/Minimalist) -->
-    <div id="page-home" class="page-view active">
-      <header class="max-w-7xl mx-auto mb-16 fade-in h-[70vh] flex flex-col items-center justify-center">
-        <div class="hero-badge inline-flex items-center gap-3 px-8 py-3 border border-[var(--matrix-green)] rounded-full text-[var(--matrix-green)] text-xs mb-12 bg-[rgba(0,255,65,0.05)] backdrop-blur-sm">
-          <span class="tracking-widest font-bold">SYSTEM INITIALIZED</span>
-        </div>
-        <div class="glitch-wrapper mb-8">
-          <h1 class="glitch-text" data-text="وثيقة التطبيع">وثيقة التطبيع</h1>
-        </div>
-        <p class="text-lg md:text-xl text-[var(--muted)] max-w-3xl mb-10 leading-relaxed text-center">
-          وثيقة تفاعلية متجددة توثق مواقف الدول العربية
-          <br>
-          <span class="text-white font-bold">من القضية الفلسطينية والكيان الصهيوني</span>
-        </p>
-        <div class="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[rgba(20,153,84,0.2)] via-[rgba(228,49,43,0.2)] to-[rgba(20,153,84,0.2)] rounded-full border border-[var(--matrix-green)]">
-          <span class="font-black text-white tracking-wider">FREE PALESTINE</span>
-        </div>
-      </header>
-    </div>
-
-    <!-- PAGE: COUNTRIES HISTORY (Moved from Home) -->
-    <div id="page-countries" class="page-view">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-12 section-header fade-in">
-          <h2 class="text-4xl md:text-5xl font-black text-[var(--matrix-green)]">تاريخ الدول العربية</h2>
-          <p class="text-[var(--muted)] text-sm mt-4">Archives of Arab Nations</p>
-        </div>
-        <main id="countries-container" class="space-y-16">
-          <div class="text-center text-[var(--muted)] py-20">
-            <div class="inline-flex items-center gap-3">
-              <div class="w-3 h-3 border-2 border-[var(--matrix-green)] border-t-transparent rounded-full animate-spin"></div>
-              <span>جاري تحميل البيانات...</span>
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
-
-    <!-- PAGE: PALESTINE -->
-    <div id="page-palestine" class="page-view">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-12 section-header fade-in">
-          <h2 class="text-4xl md:text-5xl font-black text-[var(--accent-gold)]">فلسطين</h2>
-          <p class="text-[var(--muted)] text-sm mt-4">The Land • The People • The Resistance</p>
-        </div>
-        <div class="palestine-section fade-in">
-          <div id="palestine-grid" class="grid grid-cols-1 gap-6"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PAGE: SOVEREIGNTY -->
-    <div id="page-sovereignty" class="page-view">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-12 section-header fade-in">
-          <h2 class="text-4xl md:text-5xl font-black text-[var(--accent-purple)]">السيادة المخطوفة</h2>
-          <p class="text-[var(--muted)] text-sm mt-4">When Independence is Traded for Survival</p>
-        </div>
-        <div class="sovereignty-section fade-in">
-          <div id="sovereignty-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PAGE: EXTERNAL (CONTROL LIES) -->
-    <div id="page-external" class="page-view">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-12 section-header fade-in">
-          <h2 class="text-4xl md:text-5xl font-black text-gray-300">الأكاذيب المسيطرة</h2>
-          <p class="text-[var(--muted)] text-sm mt-4">أدوات تحكم خفية تتحكم بمصيرنا</p>
-        </div>
-        <div class="external-section fade-in">
-          <div id="external-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PAGE: EVIDENCE -->
-    <div id="page-evidence" class="page-view">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-12 section-header fade-in">
-          <h2 class="text-4xl md:text-5xl font-black text-[var(--accent-blue)]">وثائق الأدلة المرئية</h2>
-          <p class="text-[var(--muted)] text-sm mt-4 max-w-2xl mx-auto">قاعدة بيانات شاملة</p>
-        </div>
-        <div class="evidence-section fade-in">
-           <p class="text-center text-gray-500">قيد الإنشاء...</p>
-        </div>
-      </div>
-    </div>
-
+  <!-- PAGE: COUNTRIES (History) -->
+  <div id="page-countries" class="page">
+    <div id="countries-container"></div>
   </div>
 
-  <!-- Detail Modal -->
-  <div id="detail-modal" class="modal-overlay" onclick="closeModalOnBackdrop(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div id="modal-body" class="relative p-8 md:p-12"></div>
+  <!-- PAGE: PALESTINE -->
+  <div id="page-palestine" class="page">
+    <div class="section-title" style="border-color: var(--gold); color: var(--gold);">فلسطين</div>
+    <p class="section-desc">جوهر القضية وقلب الأمة النابض.</p>
+    <div id="palestine-container" class="card-grid"></div>
+  </div>
+
+  <!-- PAGE: SOVEREIGNTY -->
+  <div id="page-sovereignty" class="page">
+    <div class="section-title" style="border-color: var(--purple); color: var(--purple);">السيادة المخطوفة</div>
+    <p class="section-desc">أدوات التحكم الخفية في مصير الأمم.</p>
+    <div id="sovereignty-container" class="card-grid"></div>
+  </div>
+
+  <!-- PAGE: LIES -->
+  <div id="page-lies" class="page">
+    <div class="section-title" style="border-color: var(--red); color: var(--red);">الأكاذيب المسيطرة</div>
+    <p class="section-desc">مفاهيم زرعت في عقولنا لخدمة مصادر خفية.</p>
+    <div id="lies-container" class="card-grid"></div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeModal()">X</button>
+      <div id="modal-content"></div>
     </div>
   </div>
 
-  <!-- BTC Modal -->
-  <div id="btcModal" class="btc-modal-overlay" onclick="closeBTCModalOnBackdrop(event)">
-    <div class="btc-modal-content" onclick="event.stopPropagation()">
-      <button class="close-btc-modal" onclick="closeBTCModal()">×</button>
-      <h2 class="text-2xl font-black mb-2 text-[var(--accent-gold)]">Support the Project</h2>
-      <p class="text-gray-400 mb-6 text-sm">Bitcoin address</p>
-      <div class="btc-address-box bg-black border border-gray-700 p-4 rounded-lg text-yellow-500 text-xs break-all mb-4">
-        bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4
-      </div>
-      <button class="copy-btn bg-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:bg-yellow-500 transition" onclick="copyBTC()">Copy Address</button>
-    </div>
-  </div>
+  <!-- Donate Button -->
+  <button class="donate-btn" onclick="alert('BTC: bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 13v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h.5z"/><path d="M8 4a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 8 4zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 10 4zm-4 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 4z"/></svg>
+    Donate
+  </button>
 
   <script>
-    // --- MATRIX BACKGROUND LOGIC ---
-    const canvas = document.getElementById('matrix-canvas');
+    // --- 1. MATRIX RAIN ANIMATION (Simplified & Clean) ---
+    const canvas = document.getElementById('matrix-bg');
     const ctx = canvas.getContext('2d');
-    const cursorEl = document.getElementById('cursor');
-    let width, height;
-    let particles = [];
-    const particleCount = 70; // Lower count for performance
-    const mouse = { x: -1000, y: -1000, radius: 150 };
-
+    
     function resizeCanvas() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Mouse and Touch handling for Matrix
-    window.addEventListener('mousemove', e => {
-        mouse.x = e.x;
-        mouse.y = e.y;
-        cursorEl.style.left = e.x + 'px';
-        cursorEl.style.top = e.y + 'px';
-    });
+    const letters = "01";
+    const fontSize = 14;
+    let columns = canvas.width / fontSize; 
+    let drops = Array(Math.floor(columns)).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; // Fade effect
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = "#00FF41"; // Matrix Green
+      ctx.font = fontSize + "px courier";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 50);
+
+    // --- 2. DATA RENDERING LOGIC ---
     
-    window.addEventListener('touchmove', e => {
-        if(e.touches.length > 0) {
-            mouse.x = e.touches[0].clientX;
-            mouse.y = e.touches[0].clientY;
-        }
-    });
-    
-    window.addEventListener('touchend', () => {
-        mouse.x = -1000;
-        mouse.y = -1000;
-    });
-
-    function createParticle() {
-        let homeX = Math.random() * width;
-        let homeY = Math.random() * height;
-        return {
-            x: homeX, y: homeY,
-            vx: 0, vy: 0,
-            homeX: homeX, homeY: homeY,
-            size: Math.random() * 2 + 1,
-            color: `rgba(0, ${Math.floor(200 + Math.random()*55)}, ${Math.floor(Math.random()*50)}, 1)` 
-        };
+    // Check if data exists
+    if (typeof countriesData === 'undefined') {
+      document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;'>خطأ: لم يتم تحميل ملف البيانات (data.js)</h1>";
+    } else {
+      renderAllData();
     }
 
-    for (let i = 0; i < particleCount; i++) particles.push(createParticle());
-
-    function animateMatrix() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // Trail effect
-        ctx.fillRect(0, 0, width, height);
-
-        // Connections
-        ctx.strokeStyle = 'rgba(0, 255, 65, 0.08)';
-        ctx.lineWidth = 0.5;
-        for (let i = 0; i < particles.length; i++) {
-            let p1 = particles[i];
-            // Only connect nearby particles for performance
-            for (let j = i + 1; j < particles.length; j++) {
-                let p2 = particles[j];
-                let dx = p1.x - p2.x;
-                let dy = p1.y - p2.y;
-                let distSq = dx * dx + dy * dy;
-                if (distSq < 6000) { 
-                    ctx.beginPath();
-                    ctx.moveTo(p1.x, p1.y);
-                    ctx.lineTo(p2.x, p2.y);
-                    ctx.stroke();
-                }
-            }
-        }
-
-        // Particles
-        ctx.shadowBlur = 5;
-        ctx.shadowColor = "#00FF41";
-        for (let i = 0; i < particles.length; i++) {
-            let p = particles[i];
-            
-            let dx = mouse.x - p.x;
-            let dy = mouse.y - p.y;
-            let dist = Math.sqrt(dx * dx + dy * dy);
-            let homeDx = p.homeX - p.x;
-            let homeDy = p.homeY - p.y;
-            
-            if (dist < mouse.radius) {
-                let force = (mouse.radius - dist) / mouse.radius;
-                let angle = Math.atan2(dy, dx);
-                let targetVX = Math.cos(angle + Math.PI/2) * 2 + dx * 0.03;
-                let targetVY = Math.sin(angle + Math.PI/2) * 2 + dy * 0.03;
-                p.vx += (targetVX - p.vx) * 0.1;
-                p.vy += (targetVY - p.vy) * 0.1;
-            } else {
-                p.vx += homeDx * 0.05; 
-                p.vy += homeDy * 0.05;
-            }
-
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vx *= 0.90;
-            p.vy *= 0.90;
-
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fillStyle = p.color;
-            ctx.fill();
-        }
-        ctx.shadowBlur = 0;
-        requestAnimationFrame(animateMatrix);
-    }
-    animateMatrix();
-    // --- END MATRIX LOGIC ---
-
-
-    // --- APP LOGIC ---
-    function navigateTo(pageId) {
-      document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-      const targetPage = document.getElementById(`page-${pageId}`);
-      if (targetPage) {
-        targetPage.classList.add('active');
-        window.scrollTo(0, 0);
-      }
-      const activeBtn = document.querySelector(`.nav-btn[data-page="${pageId}"]`);
-      if (activeBtn) activeBtn.classList.add('active');
-    }
-
-    (function() {
-      if (typeof levels === 'undefined' || typeof countriesData === 'undefined') {
-        document.getElementById('countries-container').innerHTML = `<div class="text-center text-red-500 p-10">Error loading data.js</div>`;
-        return;
-      }
-
-      function renderApp() {
-        // Render Countries Page (formerly Home)
-        const countriesContainer = document.getElementById('countries-container');
-        countriesContainer.innerHTML = '';
-        for (let i = 1; i <= 5; i++) {
-          const lInfo = levels[i];
-          const lCountries = countriesData.filter(c => c.level === i);
-          if (lCountries.length === 0) continue;
-
-          const s = document.createElement('section');
-          s.className = `level-section level-${i} fade-in`;
-          s.innerHTML = `
-            <div class="p-6 border-b border-[var(--border)] flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h2 class="text-2xl font-black tracking-tight">${lInfo.title}</h2>
-                <p class="text-sm text-[var(--muted)] mt-2">${lInfo.desc}</p>
-              </div>
-              <span class="px-4 py-1 text-xs font-bold rounded-full" style="color: ${getLevelColor(i, 'hex')}; border: 1px solid ${getLevelColor(i, 'hex')};">
-                ${lCountries.length} دول
-              </span>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
-              ${renderCards(lCountries)}
-            </div>
-          `;
-          countriesContainer.appendChild(s);
-        }
-
-        // Render Special Sections
-        renderSpecial('palestine', 'palestine-grid', 'palestine-card');
-        renderSpecial('sovereignty', 'sovereignty-grid', 'sovereignty-card');
-        renderSpecial('external', 'external-grid', 'external-card');
-      }
-
-      function renderCards(countries) {
-        return countries.map((c, i) => `
-          <div class="country-card stagger-item" onclick="openModal(${c.id})" style="animation-delay: ${i * 0.05}s">
-            <h3 class="text-xl font-black mb-2">${c.name}</h3>
-            ${c.subtitle ? `<p class="text-sm text-[var(--muted)] mb-4">${c.subtitle}</p>` : ''}
-            <div class="mt-auto pt-4 border-t border-[var(--border)] flex justify-between items-center">
-               <span class="text-xs text-[var(--matrix-green)]">ملف تفاعلي</span>
-               <span class="text-xs text-[var(--muted)]">اضغط للفتح</span>
-            </div>
-          </div>
-        `).join('');
-      }
-
-      function renderSpecial(type, gridId, cardClass) {
-        let items = [];
-        // Palestine: ID 100
-        if (type === 'palestine') items = countriesData.filter(c => c.id === 100);
-        // Sovereignty: IDs 101 to 199
-        else if (type === 'sovereignty') items = countriesData.filter(c => c.id >= 101 && c.id < 200);
-        // External: IDs 200+
-        else if (type === 'external') items = countriesData.filter(c => c.id >= 200);
-
-        const grid = document.getElementById(gridId);
-        if (!grid) return;
-
-        if (items.length > 0) {
-          grid.innerHTML = items.map((item, index) => {
-            let style = '';
-            if (type === 'palestine') style = 'color: var(--accent-gold);';
-            else if (type === 'sovereignty') style = 'color: var(--accent-purple);';
-            else if (type === 'external') style = 'color: #9ca3af;';
-
-            return `
-              <div class="${cardClass} stagger-item" onclick="openModal(${item.id})" style="animation-delay: ${index * 0.1}s">
-                <h3 class="text-2xl font-black mb-2" style="${style}">${item.name}</h3>
-                ${item.subtitle ? `<p class="text-sm text-gray-400">${item.subtitle}</p>` : ''}
-              </div>
-            `;
-          }).join('');
-        }
-      }
-
-      function getLevelColor(l, t) {
-        const c = { 1: { hex: '#059669' }, 2: { hex: '#0891b2' }, 3: { hex: '#d97706' }, 4: { hex: '#2563eb' }, 5: { hex: '#dc2626' }, 100: { hex: '#D4AF37' }, 101: { hex: '#8A2BE2' } };
-        return c[l] ? c[l][t] : '#ffffff';
-      }
-
-      window.openModal = function(id) {
-        const c = countriesData.find(x => x.id === id);
-        if (!c) return;
-        const m = document.getElementById('detail-modal');
-        const b = document.getElementById('modal-body');
+    function renderAllData() {
+      // A. Render Countries (Levels 1-5)
+      const countriesContainer = document.getElementById('countries-container');
+      for (let i = 1; i <= 5; i++) {
+        const levelInfo = levels[i];
+        const items = countriesData.filter(c => c.level === i);
         
-        let col = '#00FF41'; // Default Matrix Green
-        if (c.level) col = getLevelColor(c.level, 'hex');
-        else if (c.id === 100) col = '#D4AF37';
-        else if (c.id >= 101 && c.id < 200) col = '#8A2BE2';
-        else if (c.id >= 200) col = '#6b7280';
+        if (items.length === 0) continue;
 
-        let ev = c.events ? fmt(c.events) : '<p class="text-center text-gray-500 py-10">لا توجد بيانات</p>';
-        
-        let linksHtml = '';
-        if (c.links && c.links.length > 0) {
-           linksHtml += `<div class="links-list">
-              <h4>مصادر ذات صلة:</h4>
-              ${c.links.map(link => `<a href="${link.url}" target="_blank">${link.name}</a>`).join('')}
-           </div>`;
-        }
-
-        b.innerHTML = `
-          <button onclick="closeModal()" class="absolute top-4 left-4 z-20 w-10 h-10 flex items-center justify-center bg-black border border-[var(--accent-red)] text-[var(--accent-red)] rounded-full text-xs">ESC</button>
-          <div class="p-10">
-            <div class="mb-8 border-b border-gray-800 pb-6">
-              <span class="text-xs font-bold uppercase tracking-widest" style="color: ${col}">${c.level ? levels[c.level].title.split(':')[0] : 'ملف خاص'}</span>
-              <h2 class="text-4xl font-black mt-2">${c.name}</h2>
-              ${c.subtitle ? `<p class="text-lg mt-2" style="color: ${col}">${c.subtitle}</p>` : ''}
-            </div>
-            <div>${ev}</div>
-            ${linksHtml}
-          </div>
+        let html = `
+          <div style="margin-bottom: 40px;">
+            <div class="section-title">${levelInfo.title}</div>
+            <p class="section-desc">${levelInfo.desc}</p>
+            <div class="card-grid">
         `;
-        m.classList.add('active');
-        document.body.style.overflow = 'hidden';
-      };
 
-      window.closeModal = function() { document.getElementById('detail-modal').classList.remove('active'); document.body.style.overflow = ''; };
-      window.closeModalOnBackdrop = function(e) { if (e.target.id === 'detail-modal') closeModal(); };
+        items.forEach(item => {
+          html += createCardHTML(item);
+        });
 
-      function fmt(t) {
-        let p = t.replace(/\n/g, '<br>');
-        p = p.replace(/الحدث:/g, '<br><span class="label-event">الحدث:</span>');
-        p = p.replace(/الأثر على العرب:/g, '<br><span class="label-impact">الأثر على العرب:</span>');
-        p = p.replace(/الرابط:/g, '<br><span class="label-source">الرابط:</span>');
-        p = p.replace(/التفاصيل:/g, '<br><span class="label-link">التفاصيل:</span>');
-        return `<div class="data-body-text">${p}</div>`;
+        html += `</div></div>`;
+        countriesContainer.innerHTML += html;
       }
 
-      renderApp();
-    })();
+      // B. Render Palestine (ID 100)
+      const palestineContainer = document.getElementById('palestine-container');
+      const palestineData = countriesData.filter(c => c.id === 100);
+      palestineData.forEach(item => palestineContainer.innerHTML += createCardHTML(item));
 
-    // BTC Functions
-    window.openBTCModal = function() { document.getElementById('btcModal').classList.add('active'); };
-    window.closeBTCModal = function() { document.getElementById('btcModal').classList.remove('active'); };
-    window.closeBTCModalOnBackdrop = function(e) { if (e.target.id === 'btcModal') closeBTCModal(); };
-    window.copyBTC = function() {
-      navigator.clipboard.writeText("bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4");
-      const n = document.createElement('div');
-      n.className = 'fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-full text-sm font-bold z-[200]';
-      n.innerText = 'تم النسخ!';
-      document.body.appendChild(n);
-      setTimeout(() => n.remove(), 2000);
-      setTimeout(() => closeBTCModal(), 500);
-    };
+      // C. Render Sovereignty (IDs 101-199)
+      const sovereigntyContainer = document.getElementById('sovereignty-container');
+      const sovereigntyData = countriesData.filter(c => c.id >= 101 && c.id < 200);
+      sovereigntyData.forEach(item => sovereigntyContainer.innerHTML += createCardHTML(item));
 
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(); closeBTCModal(); } });
+      // D. Render Lies (IDs 200+)
+      const liesContainer = document.getElementById('lies-container');
+      const liesData = countriesData.filter(c => c.id >= 200);
+      liesData.forEach(item => liesContainer.innerHTML += createCardHTML(item));
+    }
+
+    function createCardHTML(item) {
+      return `
+        <div class="card" onclick="openModal(${item.id})">
+          <div class="card-title">${item.name}</div>
+          <div class="card-sub">${item.subtitle || ''}</div>
+        </div>
+      `;
+    }
+
+    // --- 3. NAVIGATION & MODAL LOGIC ---
+
+    window.showPage = function(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      // Show selected
+      document.getElementById('page-' + pageId).classList.add('active');
+      
+      // Update Nav Buttons
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active'); 
+      
+      window.scrollTo(0, 0); // Scroll to top
+    }
+
+    window.openModal = function(id) {
+      const item = countriesData.find(c => c.id === id);
+      if (!item) return;
+
+      const modal = document.getElementById('modal');
+      const content = document.getElementById('modal-content');
+      
+      content.innerHTML = `
+        <h2 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 10px; color: var(--green);">${item.name}</h2>
+        <p style="color: var(--muted); margin-bottom: 20px;">${item.subtitle || ''}</p>
+        <div style="line-height: 1.8; color: #ddd;">
+          ${item.events.replace(/\n/g, '<br>')}
+        </div>
+      `;
+      
+      modal.classList.add('active');
+    }
+
+    window.closeModal = function(e) {
+      // If passed explicitly or clicked overlay
+      const modal = document.getElementById('modal');
+      modal.classList.remove('active');
+    }
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
   </script>
 </body>
 </html>
