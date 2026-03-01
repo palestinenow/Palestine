@@ -473,6 +473,29 @@
     .modal-table th { background: linear-gradient(180deg, rgba(20, 153, 84, 0.3), rgba(20, 153, 84, 0.1)); color: var(--accent); font-weight: 700; padding: 0.75rem 0.5rem; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
     .modal-table td { padding: 0.75rem 0.5rem; border: 1px solid rgba(255,255,255,0.05); vertical-align: top; color: #d1d5db; }
 
+    /* Links List in Modal */
+    .links-list {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .links-list h4 {
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    .links-list a {
+      display: block;
+      color: var(--accent-gold);
+      text-decoration: none;
+      padding: 0.25rem 0;
+      transition: color 0.2s;
+    }
+    .links-list a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+
     /* Animations */
     .fade-in { animation: fadeIn 1s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
@@ -779,6 +802,15 @@
         else if (c.id >= 200) col = '#6b7280';
 
         let ev = c.events ? fmt(c.events) : '<p class="text-center text-gray-500 py-10">لا توجد بيانات</p>';
+        
+        // Links HTML generation
+        let linksHtml = '';
+        if (c.links && c.links.length > 0) {
+           linksHtml += `<div class="links-list">
+              <h4>مصادر ذات صلة:</h4>
+              ${c.links.map(link => `<a href="${link.url}" target="_blank">${link.name}</a>`).join('')}
+           </div>`;
+        }
 
         b.innerHTML = `
           <button onclick="closeModal()" class="absolute top-4 left-4 z-20 w-10 h-10 flex items-center justify-center bg-black border border-[var(--accent-red)] text-[var(--accent-red)] rounded-full text-xs">ESC</button>
@@ -789,6 +821,7 @@
               ${c.subtitle ? `<p class="text-lg mt-2" style="color: ${col}">${c.subtitle}</p>` : ''}
             </div>
             <div>${ev}</div>
+            ${linksHtml}
           </div>
         `;
         m.classList.add('active');
