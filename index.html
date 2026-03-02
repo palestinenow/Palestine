@@ -57,7 +57,6 @@
         <!-- PATH TO LIBERATION -->
         <div id="page-path" class="page-view">
             <div class="liberation-content">
-                <!-- Full content from previous step -->
                 <div class="lib-section"><h1 style="font-size: 2.5rem; margin-bottom: 1rem;">طريق التحرر</h1></div>
                 <div class="lib-section"><div class="lib-title">قبل أن تبدأ</div><p>أنت اليوم عبد... الحرية الحقيقية هي أن تكون عبداً لله فقط.</p></div>
             </div>
@@ -117,23 +116,15 @@
         <div class="brain-nature-bg"></div>
         <div class="brain-soft-overlay"></div>
 
-        <!-- Brain Login Screen -->
-        <div class="brain-login-screen" id="brain-login">
-            <div class="brain-card">
-                <h1 class="brain-logo">🧠 الـبـرين</h1>
-                <p class="brain-subtitle">منصة المعرفة القرآنية</p>
-                <div class="brain-input-group">
-                    <input type="password" id="brain-password" placeholder="كلمة المرور">
-                    <button onclick="checkBrainPassword()">دخول</button>
-                </div>
-            </div>
+        <!-- Brain Login Screen (Hidden initially via CSS and Logic) -->
+        <div class="brain-login-screen" id="brain-login" style="display: none;">
+            <!-- Content ignored because we skip it -->
         </div>
 
-        <!-- Brain Closed Screen -->
+        <!-- Brain Closed Screen (Hidden) -->
         <div class="brain-closed-screen" id="brain-closed" style="display: none;">
             <div class="brain-card">
                 <p style="font-size: 1.3rem; text-align: center;">عذراً، هذه الصفحة مغلقة للتطوير</p>
-                <p style="font-size: 0.9rem; color: #5a7c5a; text-align: center; margin-top: 15px;">Please come back another time</p>
             </div>
         </div>
 
