@@ -44,4 +44,292 @@ document.addEventListener('DOMContentLoaded', function() {
             const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
             x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
             const u = this.fade(x), v = this.fade(y), w = this.fade(z);
-            const A = this.p[X] + Y, AA = this.p[A] + Z, AB = this.p[A + 1] + Z, B = this.p[X + 1] +
+            const A = this.p[X] + Y, AA = this.p[A] + Z, AB = this.p[A + 1] + Z, B = this.p[X + 1] + Y, BA = this.p[B] + Z, BB = this.p[B + 1] + Z;
+            return this.lerp(w, this.lerp(v, this.lerp(u, this.grad(this.p[AA], x, y, z), this.grad(this.p[BA], x - 1, y, z)), this.lerp(u, this.grad(this.p[AB], x, y - 1, z), this.grad(this.p[BB], x - 1, y - 1, z))), this.lerp(v, this.lerp(u, this.grad(this.p[AA + 1], x, y, z - 1), this.grad(this.p[BA + 1], x - 1, y, z - 1)), this.lerp(u, this.grad(this.p[AB + 1], x, y - 1, z - 1), this.grad(this.p[BB + 1], x - 1, y - 1, z - 1))));
+        }
+    }
+    const noise = new SimplifiedNoise();
+
+    // ==================== PARTICLE CLASS ====================
+    class Particle {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = 0; this.vy = 0;
+            this.speed = Math.random() * 1.5 + 0.5;
+            this.size = Math.max(0.5, Math.random() * 1.5 + 0.5);
+            this.color = CONFIG.palette[Math.floor(Math.random() * CONFIG.palette.length)];
+        }
+        update() {
+            if (!animationActive) return;
+            const angle = noise.noise(this.x * CONFIG.noiseScale, this.y * CONFIG.noiseScale, time * 0.0003) * Math.PI * 4;
+            let fx = Math.cos(angle) * this.speed;
+            let fy = Math.sin(angle) * this.speed;
+
+            if (mouse.x !== null && mouse.y !== null) {
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < mouse.radius && dist > 0) {
+                    const force = (mouse.radius - dist) / mouse.radius;
+                    const pushAngle = Math.atan2(dy, dx) + Math.PI / 2;
+                    fx += Math.cos(pushAngle) * force * 3;
+                    fy += Math.sin(pushAngle) * force * 3;
+                }
+            }
+            this.vx += (fx - this.vx) * 0.1;
+            this.vy += (fy - this.vy) * 0.1;
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+        }
+        draw() {
+            const { r, g, b } = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
+            ctx.fill();
+        }
+    }
+
+    // ==================== APP LOGIC ====================
+    function initAppLogic() {
+        if (typeof levels === 'undefined') return;
+
+        window.navigateTo = function(pageId) {
+            document.querySelectorAll('.page-view').forEach(el => {
+                el.classList.remove('active');
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            const target = document.getElementById(`page-${pageId}`);
+            if (target) {
+                target.style.display = 'block';
+                setTimeout(() => target.classList.add('active'), 10);
+                window.scrollTo({ top: 0, behavior: 'instant' });
+            }
+            const btn = document.querySelector(`.nav-btn[data-page="${pageId}"]`);
+            if (btn) btn.classList.add('active');
+        };
+
+        renderApp();
+    }
+
+    function renderApp() {
+        const container = document.getElementById('countries-container');
+        if(!container) return;
+        container.innerHTML = '';
+
+        for (let i = 1; i <= 5; i++) {
+            const levelInfo = levels[i];
+            const countries = countriesData.filter(c => c.level === i);
+            if (countries.length === 0) continue;
+
+            const section = document.createElement('section');
+            section.className = 'level-section';
+            section.innerHTML = `
+                <div style="margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+                    <h3 style="font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase;">${levelInfo.title}</h3>
+                </div>
+                <div class="grid-container">
+                    ${countries.map(c => `
+                        <div class="country-card" onclick="openModal(${c.id})">
+                            <div class="card-name">${c.name}</div>
+                            <div class="card-sub">${c.subtitle || ''}</div>
+                            <div class="card-action">View File</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(section);
+        }
+
+        renderSpecial('palestine', 'palestine-grid', countriesData.filter(c => c.id === 100));
+        renderSpecial('sovereignty', 'sovereignty-grid', countriesData.filter(c => c.id >= 101 && c.id < 200));
+        renderSpecial('external', 'external-grid', countriesData.filter(c => c.id >= 200));
+    }
+
+    function renderSpecial(type, gridId, items) {
+        const grid = document.getElementById(gridId);
+        if (!grid || items.length === 0) return;
+        
+        grid.innerHTML = items.map(item => `
+            <div class="country-card" onclick="openModal(${item.id})">
+                <div class="card-name">${item.name}</div>
+                <div class="card-sub">${item.subtitle || ''}</div>
+                <div class="card-action">Explore</div>
+            </div>
+        `).join('');
+    }
+
+    // ==================== TABLE PARSER LOGIC ====================
+    function parseTextToHTML(text) {
+        // Check if text contains tabs or multiple spaces that suggest a table
+        const lines = text.split('\n');
+        let isTable = false;
+        
+        // Simple heuristic: if multiple lines have tabs
+        if (lines.length > 2 && lines.filter(l => l.includes('\t')).length > 2) {
+            isTable = true;
+        }
+
+        if (isTable) {
+            const rows = lines.filter(l => l.trim() !== '');
+            let html = '<table class="data-table">';
+            
+            rows.forEach((row, index) => {
+                const cells = row.split('\t');
+                const tag = index === 0 ? 'th' : 'td';
+                const rowTag = index === 0 ? 'thead' : (index === 1 ? 'tbody' : '');
+                const rowClose = index === 0 ? '</thead>' : (index === rows.length - 1 ? '</tbody>' : '');
+                const rowOpen = index === 0 ? '<thead>' : (index === 1 ? '<tbody>' : '');
+
+                if (rowOpen) html += rowOpen;
+                html += '<tr>';
+                cells.forEach(cell => {
+                    html += `<${tag}>${cell.trim()}</${tag}>`;
+                });
+                html += '</tr>';
+                if (rowClose) html += rowClose;
+            });
+            
+            html += '</table>';
+            return html;
+        } else {
+            // Standard text with line breaks
+            return text.replace(/\n/g, '<br>');
+        }
+    }
+
+    window.openModal = function(id) {
+        const item = countriesData.find(c => c.id === id);
+        if (!item) return;
+
+        const modal = document.getElementById('detail-modal');
+        const body = document.getElementById('modal-body');
+        
+        // Use the table parser
+        let content = parseTextToHTML(item.events || '');
+        
+        body.innerHTML = `
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div style="margin-bottom: 2rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">${item.name}</div>
+                <div style="font-size: 0.9rem; color: var(--muted);">${item.subtitle || ''}</div>
+            </div>
+            <div class="data-body-text">${content}</div>
+        `;
+
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeModal = function() {
+        document.getElementById('detail-modal').classList.remove('active');
+        document.body.style.overflow = '';
+    };
+    
+    document.getElementById('detail-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'detail-modal') closeModal();
+    });
+
+    window.donateAlert = function() {
+        const address = "bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4";
+        navigator.clipboard.writeText(address).then(() => {
+            alert("BTC Address copied: " + address);
+        }, () => {
+            alert("BTC: " + address);
+        });
+    };
+
+    // ==================== LIGHT PAGE & BRAIN LOGIC ====================
+    window.openBrain = function() {
+        brainContainer.classList.add('visible');
+        // Initialize Brain App Logic (if not already done)
+        if (!window.brainInitialized) {
+            initBrainApp();
+            window.brainInitialized = true;
+        }
+    };
+
+    window.closeBrain = function() {
+        brainContainer.classList.remove('visible');
+    };
+
+    function initBrainApp() {
+        // We need to execute the brain script logic manually because it's inserted dynamically
+        const brainScript = document.querySelector('#brain-container script');
+        if (brainScript) {
+            // The script content is below in the HTML, it will run automatically 
+            // but variables might be local. We wrap them in window.
+        }
+    }
+
+    // ==================== ANIMATION LOOP ====================
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        particles = [];
+        for (let i = 0; i < CONFIG.particleCount; i++) particles.push(new Particle());
+    }
+
+    function animate() {
+        // Logic to fade out background animation after 4s
+        if (time > CONFIG.cleanupTime) {
+            // Make trails disappear faster (clear canvas more aggressively)
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)'; 
+        } else {
+            ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
+        }
+
+        ctx.fillRect(0, 0, width, height);
+        
+        if (time < CONFIG.cleanupTime + 200) { // Stop drawing new particles after a while to let them fade
+            ctx.globalCompositeOperation = 'lighter';
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            ctx.globalCompositeOperation = 'source-over';
+        }
+        
+        time++;
+        requestAnimationFrame(animate);
+    }
+
+    // ==================== LOADING & DRAGON SEQUENCE ====================
+    function startSequence() {
+        resize();
+        animate();
+
+        setTimeout(() => {
+            loadingOverlay.classList.add('hidden');
+
+            setTimeout(() => {
+                dragonWipe.classList.add('active');
+                
+                setTimeout(() => {
+                    mainApp.classList.add('visible');
+                    initAppLogic();
+                }, 500);
+
+                setTimeout(() => {
+                    dragonWipe.style.transition = "opacity 2.5s ease-out";
+                    dragonWipe.classList.remove('active');
+                }, 1000);
+
+            }, 500);
+
+        }, CONFIG.loadingDuration);
+    }
+
+    // Events
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+    
+    startSequence();
+
+});
