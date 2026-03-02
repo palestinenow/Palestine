@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', function() {
         noiseScale: 0.005,
         mouseRadius: 150,
         fadeSpeed: 0.05,
-        cleanupTime: 4000,
+        cleanupTime: 4000, // 4 seconds
         loadingDuration: 2000, 
         palette: [
-            { r: 0, g: 122, b: 61 },
-            { r: 255, g: 255, b: 255 },
-            { r: 30, g: 30, b: 35 },
-            { r: 206, g: 17, b: 38 }
+            { r: 0, g: 122, b: 61 },    // Green
+            { r: 255, g: 255, b: 255 }, // White
+            { r: 30, g: 30, b: 35 },    // Near-black
+            { r: 206, g: 17, b: 38 }    // Red
         ]
     };
 
@@ -201,6 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderCategories() {
         const nav = document.getElementById('heaven-nav');
+        if(!nav) return;
         nav.innerHTML = `
             <button class="heaven-cat-btn active" onclick="setCategory('all')">✨ الكل</button>
             ${brainCategories.map(c => `
@@ -213,7 +214,6 @@ document.addEventListener('DOMContentLoaded', function() {
         activeCategory = id;
         // Update active button
         document.querySelectorAll('.heaven-cat-btn').forEach(btn => btn.classList.remove('active'));
-        // Find the button that triggered it (simplest is to pass 'this' but onclick string limits us, so we search)
         const btns = document.querySelectorAll('.heaven-cat-btn');
         btns.forEach(b => { if(b.getAttribute('onclick').includes(`'${id}'`)) b.classList.add('active'); });
         
@@ -230,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderHeavenCards(data) {
         const grid = document.getElementById('heaven-results');
+        if(!grid) return;
         grid.innerHTML = data.map(item => `
             <div class="heaven-card" onclick="openHeavenModal(${item.id})">
                 <div class="heaven-card-q">${item.question}</div>
@@ -282,16 +283,42 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const modal = document.getElementById('heaven-modal');
         const body = document.getElementById('heaven-modal-body');
+        if(!modal || !body) return;
+        
         body.innerHTML = `
             <button class="heaven-modal-close" onclick="closeHeavenModal()">×</button>
             <div class="heaven-modal-q">${item.question}</div>
-            <div class="heaven-modal-a">${item.answer}<br><br><em style="color:#8e9eab;">📖 ${item.reference}</em></div>
+            <div class="heaven-modal-a">${item.answer}<br><br><em style="color:#81c784;">📖 ${item.reference}</em></div>
         `;
         modal.classList.add('show');
     }
 
     window.closeHeavenModal = function() {
-        document.getElementById('heaven-modal').classList.remove('show');
+        const modal = document.getElementById('heaven-modal');
+        if(modal) modal.classList.remove('show');
+    }
+
+    // ==================== SECRET ADMIN ACCESS (5 Clicks) ====================
+    let clickCount = 0;
+    let clickTimer = null;
+    const logo = document.querySelector('.logo'); // The "REVOLUTION" text
+
+    if (logo) {
+        logo.style.cursor = 'pointer';
+        logo.addEventListener('click', () => {
+            clickCount++;
+            if (clickTimer) clearTimeout(clickTimer);
+            
+            if (clickCount >= 5) {
+                window.location.href = 'index2.html';
+                clickCount = 0;
+            }
+
+            // Reset count if user stops clicking for 1 second
+            clickTimer = setTimeout(() => {
+                clickCount = 0;
+            }, 1000);
+        });
     }
 
     // ==================== ANIMATION LOOP ====================
