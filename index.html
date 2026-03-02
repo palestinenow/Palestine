@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIME OUT</title>
+    <title>REVOLUTION</title>
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300&family=Oswald:wght@300;500;700&family=Roboto+Mono:wght@300;400&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Inter:wght@200;400;600&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Loading Screen -->
+    <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="loader-icon">REV</div>
+        <span class="loading-text">REVOLUTION</span>
     </div>
 
-    <!-- Background Canvas -->
+    <!-- Dragon Wipe Overlay -->
+    <div id="dragon-wipe"></div>
+
+    <!-- Flow Field Canvas -->
     <canvas id="canvas"></canvas>
 
     <!-- Main Application -->
@@ -25,9 +28,8 @@
         
         <!-- Navigation -->
         <nav class="main-nav">
-            <div class="logo">REVOLUTION</div>
+            <div class="logo">SYSTEM</div>
             <div class="nav-links">
-                <!-- New Order as Requested -->
                 <button class="nav-btn active" data-page="home" onclick="navigateTo('home')">Main</button>
                 <button class="nav-btn" data-page="path" onclick="navigateTo('path')">طريق التحرر</button>
                 <button class="nav-btn" data-page="light" onclick="navigateTo('light')">Light</button>
@@ -38,7 +40,9 @@
             </div>
         </nav>
 
-        <!-- HOME PAGE -->
+        <!-- PAGES -->
+
+        <!-- HOME -->
         <div id="page-home" class="page-view active">
             <h1 class="home-title">TIME OUT</h1>
             <p class="home-subtitle">
@@ -50,36 +54,61 @@
             <button class="cta-btn" onclick="navigateTo('path')">Start The Path</button>
         </div>
 
-        <!-- PATH TO LIBERATION PAGE (طريق التحرر) -->
+        <!-- PATH TO LIBERATION (Full Content) -->
         <div id="page-path" class="page-view">
             <div class="liberation-content">
-                <h1 style="font-size: 3rem; margin-bottom: 2rem; color: white;">طريق التحرر: دليل العودة إلى الفطرة</h1>
                 
-                <div class="step-box">
-                    <h2 class="step-title">قبل أن تبدأ: الحقيقة التي لا مفر منها</h2>
-                    <p>أنت اليوم عبد. نعم، أنت. عبد لشهواتك، عبد لمديرك، عبد للبنك، عبد للإعلام، عبد للدولة، عبد لعائلتك أحياناً. كل من تتبعه غير الله تجعله رباً تعبده. الحرية الحقيقية هي أن تكون عبداً لله فقط. لا لغيره. من كان عبداً لله، لا يمكن لأحد أن يستعبده بعد ذلك. هدفك الأسمى في هذه الحياة هو الجنة.</p>
+                <div class="lib-section">
+                    <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">طريق التحرر: دليل العودة إلى الفطرة</h1>
                 </div>
 
-                <div class="step-box">
-                    <h2 class="step-title">الخطوة الأولى: السيادة الروحية والعقلية</h2>
-                    <p>اذهب إلى صفحة "النور". القرآن ليس كتاباً يُقرأ فقط. القرآن منجم أفكار. الله أنزله ليكون دستور حياة. أبو جهل لم يمت، بل تغير اسمه فقط. قوم لوط كانوا موجودين واليوم موجودون. القرآن حي يصلح لكل زمان.</p>
+                <div class="lib-section">
+                    <div class="lib-title">قبل أن تبدأ: الحقيقة التي لا مفر منها</div>
+                    <p>أنت اليوم عبد. نعم، أنت. عبد لشهواتك، عبد لمديرك، عبد للبنك، عبد للإعلام، عبد للدولة، عبد لعائلتك أحياناً. كل من تتبعه غير الله تجعله رباً تعبده.</p>
+                    <p>الحرية الحقيقية هي أن تكون عبداً لله فقط. لا لغيره. من كان عبداً لله، لا يمكن لأحد أن يستعبده بعد ذلك.</p>
+                    <p>هدفك الأسمى في هذه الحياة هو الجنة. ليس المال، لا المنصب، لا الشهرة. الجنة. كل ما تفعله يجب أن يقربك منها.</p>
+                    <p>هل تتبع مشاعرك؟ إذا غضبت عصيت الله. إذا اشتهيت عصيت الله. أنت عبد لشهوتك.</p>
+                    <p>هل تتبع رئيسك في العمل؟ تفعل ما يأمرك به حتى لو كان حراماً. أنت عبد لبشر مثلك.</p>
+                    <p>هل تتبع الدولة؟ ترفع علمها وتقاتل من أجلها وتقدس حدودها. أنت عبد لوثن اسمه "وطن".</p>
+                    <p>هل تتبع عائلتك؟ تفعل ما يريدون حتى لو كان فيه معصية الله. أنت عبد لبشر يموتون مثلك.</p>
                 </div>
 
-                <div class="step-box">
-                    <h2 class="step-title">الخطوة الثانية: السيادة البيولوجية – تحرير الجسد</h2>
-                    <p>اذهب إلى صفحة "الأكاذيب" – صندوق "حرر جسدك". اجعله قلعة حصينة. الجسد أمانة ستسأل عنها. كلوا من الطيبات وابتعدوا عن الخبائث. الطعام المصنع (الخبيث) ليس فقط حراماً بل هو ضار بالجسد. الإسراف ليس فقط كثرة الأكل بل تناول ما يضرك.</p>
+                <div class="lib-section">
+                    <div class="lib-title">الخطوة الأولى: السيادة الروحية والعقلية</div>
+                    <p>اذهب إلى صفحة "النور". في صفحة "النور" ستجد أن القرآن ليس كتاباً يُقرأ فقط. القرآن منجم أفكار. الله أنزله ليكون دستور حياة، لكننا قرأناه كأنه تعويذة نقرأها ونختمها ونموت.</p>
+                    <p>الناس يقولون: "القرآن قديم، كان زمن أبو جهل، لم يعد يناسب زماننا". هذه هي الكارثة.</p>
+                    <p>أبو جهل لم يمت. أبو جهل تغير اسمه فقط. طريقته في الكفر، طريقته في الصد، طريقته في المكر – كلها موجودة اليوم في قادة العالم. الفرق أن أبا جهل كان يلبس جبة وعمامة، وهم يلبسون بذلات وكرافات.</p>
+                    <p>قوم لوط كانوا موجودين، واليوم "مجتمع الميم" موجود. نفس الفعل، نفس الإنكار، نفس العقاب المنتظر. الأسماء تغيرت، الأدوات تغيرت، لكن الفكرة واحدة، والله واحد، وسنته واحدة.</p>
+                    <p>القرآن حي. يصلح لكل زمان ومكان. ليس لأنه كتاب مقدس نقدسه، بل لأنه يحتوي على قوانين إلهية ثابتة، ونماذج بشرية تتكرر، وأفكار يمكن استخراجها وتطبيقها اليوم.</p>
                 </div>
 
-                <div class="step-box">
-                    <h2 class="step-title">الخطوة الثالثة: بناء الرؤية العالمية</h2>
-                    <p>اذهب إلى كل الصفحات. انظر إلى ما يفعلون، لا إلى ما يقولون. في فلسطين: 42,000 قتيل. في الدول العربية: تطبيع واتفاقيات غاز. انظر إلى إسرائيل: تكنولوجيا بلا إنسانية هي وحش. القرآن هو الذي يمنعك أن تصبح هذا الوحش.</p>
+                <div class="lib-section">
+                    <div class="lib-title">الخطوة الثانية: السيادة البيولوجية</div>
+                    <p>اذهب إلى صفحة "الأكاذيب" – صندوق "حرر جسدك". اجعله قلعة حصينة.</p>
+                    <p><strong>الفكرة الأولى: الجسد أمانة ستسأل عنها</strong><br>الآية: "ثُمَّ لَتُسْأَلُنَّ يَوْمَئِذٍ عَنِ النَّعِيمِ". النعيم ليس فقط المال والبنين. الصحة، والعافية، والطعام الطيب، والماء النقي – كلها نعم ستسأل عنها.</p>
+                    <p><strong>الفكرة الثانية: كلوا من الطيبات</strong><br>الله حدد لنا الطيب من الطعام (الطبيعي، النظيف) والخبيث (المصنع، المسموم). الطيبات هي ما كان يأكله أجدادنا. الخبائث هي ما نأكله اليوم.</p>
+                    <p><strong>الفكرة الثالثة: كلوا واشربوا ولا تسرفوا</strong><br>الإسراف ليس فقط كثرة الأكل. الإسراف هو تناول ما يضرك. شركات الأغذية تريدك أن تسرف – تأكل أكثر، تشرب أكثر، تستهلك أكثر.</p>
                 </div>
 
-                <div class="step-box">
-                    <h2 class="step-title">الخاتمة</h2>
-                    <p>هذه رحلة عمرك. لن تصل إلى نهايتها أبداً. لا تصدقني. لا تصدق أحداً. تحقق بنفسك. ابنِ معرفتك بنفسك. واجعل القرآن دليلك.</p>
-                    <p style="margin-top: 1rem; color: var(--accent);">"لا تنظر إلى ما يقولون... انظر إلى ما يفعلون."</p>
+                <div class="lib-section">
+                    <div class="lib-title">الخطوة الثالثة: بناء الرؤية العالمية</div>
+                    <p>اذهب إلى كل الصفحات. الآن بعد أن بنيت عقلك وطهّرت جسدك، أنت جاهز لترى العالم كما هو حقاً.</p>
+                    <p>ماذا ترى في فلسطين؟ يقولون: "إسرائيل تدافع عن نفسها". ماذا ترى أنت؟ 42,000 قتيل، 21,000 طفل، مستشفيات تُقصف.</p>
+                    <p>ماذا يفعل العرب؟ يقولون: "نحن ندعم فلسطين". ماذا يفعلون؟ يطبعون مع إسرائيل، يفتحون سفارات.</p>
+                    <p>انظر إلى ما يفعلون، لا إلى ما يقولون.</p>
                 </div>
+
+                <div class="lib-section">
+                    <div class="lib-title">وأخيراً: لماذا القرآن؟</div>
+                    <p>القرآن لا يعطيك معادلات فيزيائية. يعطيك الشيء الوحيد الذي بدونه تصبح آلة مجردة بلا روح: الإنسانية.</p>
+                    <p>بدون القرآن، ستصبح كتاباً في زاوية. تعرف ولا تعمل، تفهم ولا تتحرك.</p>
+                    <p>التكنولوجيا بلا إنسانية هي وحش. القرآن هو الذي يمنعك أن تصبح هذا الوحش.</p>
+                </div>
+
+                <div class="lib-section">
+                    <p style="color: var(--accent-green); text-align: center;">لا تنظر إلى ما يقولون... انظر إلى ما يفعلون.</p>
+                </div>
+
             </div>
         </div>
 
@@ -87,9 +116,10 @@
         <div id="page-light" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">النور</h2>
+                <div class="section-desc">The Light</div>
             </div>
-            <div style="height: 50vh; display: flex; align-items: center; justify-content: center; border: 1px solid #333;">
-                <p style="color: var(--muted); font-family: 'Roboto Mono';">CONTENT COMING SOON</p>
+            <div style="height: 50vh; display: flex; align-items: center; justify-content: center;">
+                <p style="color: var(--muted);">Coming Soon</p>
             </div>
         </div>
 
@@ -97,6 +127,7 @@
         <div id="page-countries" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">تاريخ الدول العربية</h2>
+                <div class="section-desc">Archives</div>
             </div>
             <main id="countries-container"></main>
         </div>
@@ -105,6 +136,7 @@
         <div id="page-palestine" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">فلسطين</h2>
+                <div class="section-desc">The Core</div>
             </div>
             <div id="palestine-grid" class="grid-container"></div>
         </div>
@@ -113,6 +145,7 @@
         <div id="page-sovereignty" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">السيادة المخطوفة</h2>
+                <div class="section-desc">Sovereignty Files</div>
             </div>
             <div id="sovereignty-grid" class="grid-container"></div>
         </div>
@@ -121,16 +154,16 @@
         <div id="page-external" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">الأكاذيب المسيطرة</h2>
+                <div class="section-desc">Control Tools</div>
             </div>
             <div id="external-grid" class="grid-container"></div>
         </div>
 
-        <!-- Donation Icon -->
-        <div class="donate-btn" onclick="openModal(102)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="none">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/>
-            </svg>
-        </div>
+        <!-- Donation Button -->
+        <button class="donate-btn" onclick="donateAlert()">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 13v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h.5z"/><path d="M8 4a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 8 4zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 10 4zm-4 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 4z"/></svg>
+            Donate
+        </button>
 
     </div>
 
