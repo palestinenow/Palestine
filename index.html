@@ -10,14 +10,28 @@
 <body>
 
     <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay"><span class="loading-text">REVOLUTION</span></div>
-    <div id="dragon-wipe"></div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <span class="loading-text">REVOLUTION</span>
+    </div>
+
+    <!-- Dragon Transition (From Provided Code) -->
+    <div class="dragon-wipe" id="dragonWipe">
+        <div class="dragon-trail"></div>
+        <div class="dragon-body">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M95,50 C85,45 80,35 70,30 C60,25 50,25 40,30 C35,32 30,35 25,40 C20,35 15,30 10,30 C5,30 2,35 5,45 C8,55 5,60 10,65 C15,70 25,70 35,65 C30,75 25,85 30,90 C35,95 45,95 55,90 C65,85 75,75 85,65 C90,60 100,55 95,50 Z M20,40 C22,40 24,42 24,45 C24,48 22,50 19,50 C16,50 14,48 15,45 C16,42 18,40 20,40 Z"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Canvas -->
     <canvas id="canvas"></canvas>
 
     <!-- Main Application -->
     <div id="main-app">
+        <!-- Navigation -->
         <nav class="main-nav">
-            <div class="logo">SYSTEM</div>
+            <div class="logo">REVOLUTION</div>
             <div class="nav-links">
                 <button class="nav-btn active" data-page="home" onclick="navigateTo('home')">Main</button>
                 <button class="nav-btn" data-page="path" onclick="navigateTo('path')">طريق التحرر</button>
@@ -32,7 +46,7 @@
         <!-- HOME -->
         <div id="page-home" class="page-view active">
             <h1 class="home-title">TIME OUT</h1>
-            <p class="home-subtitle">Whether you believe this is real or not, it will not change reality...</p>
+            <p class="home-subtitle">Whether you believe this is real or not...</p>
             <button class="cta-btn" onclick="navigateTo('path')">Start The Path</button>
         </div>
 
@@ -40,7 +54,7 @@
         <div id="page-path" class="page-view">
             <div class="liberation-content">
                 <div class="lib-section"><h1 style="font-size: 2.5rem; margin-bottom: 1rem;">طريق التحرر</h1></div>
-                <div class="lib-section"><div class="lib-title">قبل أن تبدأ</div><p>أنت اليوم عبد... الحرية الحقيقية هي أن تكون عبداً لله فقط.</p></div>
+                <div class="lib-section"><div class="lib-title">قبل أن تبدأ</div><p>أنت اليوم عبد...</p></div>
             </div>
         </div>
 
@@ -54,7 +68,7 @@
             </div>
         </div>
 
-        <!-- Other Pages (Countries, Palestine, etc) remain unchanged -->
+        <!-- COUNTRIES -->
         <div id="page-countries" class="page-view"><div class="section-header"><h2 class="section-title">تاريخ الدول العربية</h2></div><main id="countries-container"></main></div>
         <div id="page-palestine" class="page-view"><div class="section-header"><h2 class="section-title">فلسطين</h2></div><div id="palestine-grid" class="grid-container"></div></div>
         <div id="page-sovereignty" class="page-view"><div class="section-header"><h2 class="section-title">السيادة المخطوفة</h2></div><div id="sovereignty-grid" class="grid-container"></div></div>
@@ -66,48 +80,25 @@
     <!-- Modal -->
     <div id="detail-modal" class="modal-overlay"><div class="modal-content"><div id="modal-body"></div></div></div>
 
-    <!-- BRAIN CONTAINER (HEAVEN THEME) -->
+    <!-- BRAIN CONTAINER -->
     <div id="brain-container">
-        <button class="back-btn-heaven" onclick="closeBrain()">← Back to Revolution</button>
-
+        <button class="back-btn-heaven" onclick="closeBrain()">← Back</button>
         <div class="heaven-layout">
-            <!-- Sidebar -->
-            <aside class="heaven-sidebar">
-                <div class="heaven-logo">🧠 الـبـرين</div>
-                <nav id="heaven-nav">
-                    <!-- Injected via JS -->
-                </nav>
-            </aside>
-
-            <!-- Main Content -->
+            <aside class="heaven-sidebar"><div class="heaven-logo">🧠 الـبـرين</div><nav id="heaven-nav"></nav></aside>
             <main class="heaven-main">
-                <!-- Search Box -->
                 <div class="heaven-search-box">
-                    <input type="text" id="heaven-search" class="heaven-search-input" placeholder="ابحث في أفكار القرآن..." oninput="handleHeavenSearch()">
+                    <input type="text" id="heaven-search" class="heaven-search-input" placeholder="ابحث..." oninput="handleHeavenSearch()">
                     <span class="heaven-search-icon">🔍</span>
                     <div id="heaven-autocomplete" class="heaven-autocomplete"></div>
                 </div>
-
-                <!-- Results Grid -->
-                <div id="heaven-results" class="heaven-results-grid">
-                    <!-- Injected via JS -->
-                </div>
+                <div id="heaven-results" class="heaven-results-grid"></div>
             </main>
         </div>
-
-        <!-- Heaven Detail Modal -->
-        <div id="heaven-modal" class="heaven-modal-overlay" onclick="if(event.target === this) closeHeavenModal()">
-            <div class="heaven-modal-box">
-                <div id="heaven-modal-body"></div>
-            </div>
-        </div>
+        <div id="heaven-modal" class="heaven-modal-overlay" onclick="if(event.target === this) closeHeavenModal()"><div class="heaven-modal-box"><div id="heaven-modal-body"></div></div></div>
     </div>
-    <!-- RECURRING BLACK DRAGON -->
-    <div id="black-dragon" class="black-dragon"></div>
 
     <script src="data.js"></script>
     <script src="data2.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-
