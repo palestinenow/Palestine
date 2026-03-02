@@ -91,160 +91,189 @@ body, html {
 .door-container:hover .white-door { transform: perspective(500px) rotateY(-30deg); box-shadow: 20px 0 40px rgba(0,0,0,0.5); background: #fff; }
 .door-text { margin-top: 2rem; letter-spacing: 0.2em; text-transform: uppercase; font-size: 0.8rem; color: var(--muted); }
 
-/* ===== BRAIN APP HEAVEN THEME ===== */
+/* ===== BRAIN APP HEAVEN THEME (Powerful Peace & Nature) ===== */
 #brain-container {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     z-index: 20000; display: none; overflow-y: auto;
-    background: linear-gradient(180deg, #eef2f3 0%, #8e9eab 100%); /* Peaceful Sky Gradient */
     font-family: 'Tajawal', sans-serif; color: #2c3e50;
+    background: linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 50%, #fff8e1 100%); /* Soft Sky, Grass, Sun */
 }
 #brain-container.visible { display: flex; }
+
+/* Nature Background Elements (CSS Only) */
+#brain-container::before {
+    content: '';
+    position: fixed; bottom: 0; left: 0; width: 100%; height: 200px;
+    background: linear-gradient(to top, rgba(139, 195, 74, 0.2), transparent);
+    pointer-events: none; z-index: -1;
+    animation: grassWave 8s infinite alternate ease-in-out;
+}
+@keyframes grassWave { 0% { transform: skewX(-2deg); } 100% { transform: skewX(2deg); } }
 
 /* Back Button */
 .back-btn-heaven {
     position: fixed; top: 20px; left: 20px; z-index: 20001;
-    background: rgba(255,255,255,0.6); border: none;
+    background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1);
     backdrop-filter: blur(5px);
-    padding: 10px 20px; border-radius: 20px;
-    color: #5a7c5a; font-weight: bold; cursor: pointer;
-    transition: all 0.3s;
+    padding: 10px 20px; border-radius: 30px;
+    color: #2e7d32; font-weight: bold; cursor: pointer;
+    transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
-.back-btn-heaven:hover { background: #fff; transform: translateY(-2px); }
+.back-btn-heaven:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
 
 /* Heaven Layout */
 .heaven-layout {
     display: flex; width: 100%; min-height: 100vh;
-    padding-top: 70px; /* Space for back button */
+    padding-top: 80px; 
 }
 
-/* Sidebar */
+/* Sidebar (Tree of Knowledge) */
 .heaven-sidebar {
-    width: 250px;
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(10px);
-    border-left: 1px solid rgba(255,255,255,0.5);
-    padding: 2rem 1rem;
-    display: flex; flex-direction: column; gap: 10px;
+    width: 280px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(15px);
+    border-right: 1px solid rgba(255,255,255,0.6);
+    padding: 2rem 1.5rem;
+    display: flex; flex-direction: column; gap: 12px;
     height: 100vh; position: sticky; top: 0;
+    box-shadow: 5px 0 20px rgba(0,0,0,0.02);
 }
 
 .heaven-logo {
-    font-size: 1.5rem; text-align: center;
-    color: #2c5f2d; margin-bottom: 2rem;
-    font-weight: bold; letter-spacing: 1px;
+    font-size: 1.8rem; text-align: center;
+    color: #1b5e20; margin-bottom: 2rem;
+    font-weight: bold; letter-spacing: 0; 
+    font-family: 'Cormorant Garamond', serif;
 }
 
 .heaven-cat-btn {
     background: rgba(255,255,255,0.6); border: none;
-    padding: 12px 15px; border-radius: 12px;
+    padding: 14px 20px; border-radius: 16px;
     text-align: right; cursor: pointer;
-    display: flex; align-items: center; gap: 10px;
-    color: #2c3e50; transition: all 0.3s;
+    display: flex; align-items: center; gap: 12px;
+    color: #37474f; transition: all 0.3s;
+    font-size: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
-.heaven-cat-btn:hover { background: rgba(255,255,255,0.9); transform: translateX(-5px); }
-.heaven-cat-btn.active { background: #fff; color: #2c5f2d; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.heaven-cat-btn:hover { background: rgba(255,255,255,0.9); transform: translateX(-5px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.heaven-cat-btn.active { background: #ffffff; color: #1b5e20; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border: 1px solid #a5d6a7; }
 
 /* Main Content */
 .heaven-main {
-    flex: 1; padding: 2rem;
+    flex: 1; padding: 2rem 3rem;
     display: flex; flex-direction: column; align-items: center;
 }
 
-/* Search Bar (Google Style) */
+/* Search Bar (Nature Style) */
 .heaven-search-box {
-    width: 100%; max-width: 600px; margin-bottom: 3rem;
+    width: 100%; max-width: 700px; margin-bottom: 3rem;
     position: relative;
 }
 .heaven-search-input {
-    width: 100%; padding: 15px 20px 15px 50px;
-    border-radius: 30px; border: none;
-    background: rgba(255,255,255,0.8); backdrop-filter: blur(5px);
-    font-size: 1.1rem; color: #333;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    width: 100%; padding: 20px 25px 20px 60px;
+    border-radius: 50px; border: none;
+    background: rgba(255,255,255,0.9); 
+    font-size: 1.1rem; color: #263238;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
     transition: all 0.3s;
+    font-family: 'Tajawal', sans-serif;
 }
 .heaven-search-input:focus {
     outline: none; background: #fff;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
 }
 .heaven-search-icon {
-    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-    color: #5a7c5a; font-size: 1.2rem;
+    position: absolute; right: 25px; top: 50%; transform: translateY(-50%);
+    color: #66bb6a; font-size: 1.4rem;
 }
 
 /* Autocomplete Dropdown */
 .heaven-autocomplete {
     position: absolute; top: 100%; left: 0; right: 0;
-    background: #fff; border-radius: 15px;
-    margin-top: 5px; padding: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    background: #fff; border-radius: 20px;
+    margin-top: 10px; padding: 15px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
     display: none; z-index: 100;
+    border: 1px solid rgba(0,0,0,0.05);
 }
 .heaven-autocomplete.show { display: block; }
 .heaven-autocomplete-item {
-    padding: 12px; cursor: pointer;
-    border-radius: 8px; margin-bottom: 2px;
+    padding: 15px; cursor: pointer;
+    border-radius: 12px; margin-bottom: 5px;
     transition: background 0.2s; text-align: right;
 }
-.heaven-autocomplete-item:hover { background: #f0f4f8; }
-.heaven-autocomplete-item q { display: block; font-weight: 600; color: #2c3e50; }
-.heaven-autocomplete-item span { display: block; font-size: 0.8rem; color: #888; margin-top: 4px; }
+.heaven-autocomplete-item:hover { background: #f1f8e9; }
+.heaven-autocomplete-item q { display: block; font-weight: 600; color: #2e7d32; quotes: none; }
+.heaven-autocomplete-item span { display: block; font-size: 0.85rem; color: #78909c; margin-top: 5px; }
 
 /* Results Grid */
 .heaven-results-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.5rem; width: 100%;
 }
 
-/* Result Card */
+/* Result Card (Leaf/Fresh Style) */
 .heaven-card {
-    background: rgba(255,255,255,0.6); backdrop-filter: blur(5px);
-    border-radius: 15px; padding: 1.5rem;
+    background: rgba(255,255,255,0.7); backdrop-filter: blur(5px);
+    border-radius: 20px; padding: 2rem;
     border: 1px solid rgba(255,255,255,0.8);
-    transition: all 0.3s; cursor: pointer;
-    direction: rtl;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
+    direction: rtl; position: relative; overflow: hidden;
+}
+.heaven-card::before {
+    content: '🌿';
+    position: absolute; top: 10px; left: 10px; font-size: 1.5rem; opacity: 0.1;
+    transition: opacity 0.3s;
 }
 .heaven-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(46, 125, 50, 0.15);
     background: #fff;
+    border-color: #c8e6c9;
 }
-.heaven-card-q { font-size: 1.1rem; font-weight: 700; color: #2c5f2d; margin-bottom: 0.8rem; }
-.heaven-card-a { font-size: 0.9rem; color: #555; line-height: 1.6; margin-bottom: 1rem; }
-.heaven-card-ref { font-size: 0.8rem; color: #8e9eab; font-style: italic; text-align: left; }
+.heaven-card:hover::before { opacity: 0.3; }
+.heaven-card-q { font-size: 1.2rem; font-weight: 700; color: #1b5e20; margin-bottom: 1rem; }
+.heaven-card-a { font-size: 0.95rem; color: #546e7a; line-height: 1.7; margin-bottom: 1.5rem; }
+.heaven-card-ref { font-size: 0.85rem; color: #81c784; font-weight: bold; text-align: left; }
 
 /* Heaven Detail Modal */
 .heaven-modal-overlay {
     position: fixed; inset: 0;
-    background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+    background: rgba(232, 245, 233, 0.7); backdrop-filter: blur(10px);
     z-index: 30000; display: none;
     align-items: center; justify-content: center; padding: 2rem;
 }
 .heaven-modal-overlay.show { display: flex; }
 .heaven-modal-box {
-    background: #fff; border-radius: 20px;
-    width: 100%; max-width: 600px;
-    padding: 2.5rem; position: relative;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-    animation: slideUp 0.4s ease;
+    background: #fff; border-radius: 30px;
+    width: 100%; max-width: 650px;
+    padding: 3rem; position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+    animation: slideUp 0.5s ease;
+    border: 1px solid #e0e0e0;
 }
 .heaven-modal-close {
-    position: absolute; top: 15px; left: 15px;
-    background: #eee; border: none; width: 30px; height: 30px;
+    position: absolute; top: 20px; left: 20px;
+    background: #f5f5f5; border: none; width: 35px; height: 35px;
     border-radius: 50%; cursor: pointer; font-size: 1.2rem; line-height: 1;
+    color: #757575;
 }
-.heaven-modal-q { font-size: 1.5rem; color: #2c5f2d; margin-bottom: 1rem; text-align: center; }
-.heaven-modal-a { font-size: 1rem; line-height: 1.8; color: #333; text-align: justify; }
+.heaven-modal-q { font-size: 1.7rem; color: #2e7d32; margin-bottom: 1.5rem; text-align: center; line-height: 1.4; }
+.heaven-modal-a { font-size: 1.1rem; line-height: 2; color: #37474f; text-align: justify; }
+.heaven-modal-ref { margin-top: 2rem; text-align: center; color: #66bb6a; font-style: italic; font-weight: bold; }
 
 /* Mobile Responsive for Heaven */
 @media (max-width: 768px) {
     .heaven-layout { flex-direction: column; }
     .heaven-sidebar {
         width: 100%; height: auto; position: relative;
-        flex-direction: row; overflow-x: auto; gap: 5px; padding: 1rem;
-        border-left: none; border-bottom: 1px solid rgba(255,255,255,0.5);
+        flex-direction: row; overflow-x: auto; gap: 8px; padding: 1rem;
+        border-right: none; border-bottom: 1px solid rgba(0,0,0,0.05);
+        background: rgba(255,255,255,0.8);
     }
-    .heaven-cat-btn { min-width: 100px; justify-content: center; padding: 10px; }
+    .heaven-cat-btn { min-width: 110px; justify-content: center; padding: 12px; font-size: 0.9rem; }
     .heaven-logo { display: none; }
     .heaven-results-grid { grid-template-columns: 1fr; }
+    .heaven-main { padding: 1.5rem; }
 }
