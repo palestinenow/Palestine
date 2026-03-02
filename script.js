@@ -1,6 +1,6 @@
 // script.js
 
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
     'use strict';
 
     // ==================== DOM ELEMENTS ====================
@@ -16,7 +16,7 @@
         noiseScale: 0.005,
         mouseRadius: 150,
         fadeSpeed: 0.05,
-        loadingDuration: 2000, // 2 Seconds
+        loadingDuration: 2000, 
         palette: [
             { r: 0, g: 122, b: 61 },    // Green
             { r: 255, g: 255, b: 255 }, // White
@@ -32,7 +32,6 @@
     const mouse = { x: null, y: null, radius: CONFIG.mouseRadius };
 
     // ==================== SIMPLEX NOISE ====================
-    // (Included directly for portability)
     class SimplifiedNoise {
         constructor() { this.p = new Array(512); const perm = new Array(256); for (let i = 0; i < 256; i++) perm[i] = Math.floor(Math.random() * 256); for (let i = 0; i < 512; i++) this.p[i] = perm[i & 255]; }
         fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
@@ -92,7 +91,11 @@
 
     // ==================== APP LOGIC ====================
     function initAppLogic() {
-        if (typeof levels === 'undefined') return;
+        // Check if data exists
+        if (typeof levels === 'undefined') {
+            console.error("Data not loaded");
+            return;
+        }
 
         window.navigateTo = function(pageId) {
             document.querySelectorAll('.page-view').forEach(el => {
@@ -143,7 +146,6 @@
             container.appendChild(section);
         }
 
-        // Render Special Sections
         renderSpecial('palestine', 'palestine-grid', countriesData.filter(c => c.id === 100));
         renderSpecial('sovereignty', 'sovereignty-grid', countriesData.filter(c => c.id >= 101 && c.id < 200));
         renderSpecial('external', 'external-grid', countriesData.filter(c => c.id >= 200));
@@ -170,10 +172,7 @@
         const body = document.getElementById('modal-body');
         
         let content = item.events ? item.events.replace(/\n/g, '<br>') : '';
-        let links = item.links && item.links.length > 0 
-            ? `<div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">${item.links.map(l => `<a href="${l.url}" target="_blank" style="color: var(--accent-green); text-decoration: none; margin-right: 10px;">${l.name}</a>`).join('')}</div>` 
-            : '';
-
+        
         body.innerHTML = `
             <button class="modal-close" onclick="closeModal()">×</button>
             <div style="margin-bottom: 2rem;">
@@ -181,7 +180,6 @@
                 <div style="font-size: 0.9rem; color: var(--muted);">${item.subtitle || ''}</div>
             </div>
             <div class="data-body-text">${content}</div>
-            ${links}
         `;
 
         modal.classList.add('active');
@@ -197,9 +195,7 @@
         if (e.target.id === 'detail-modal') closeModal();
     });
 
-    // Donation Function
     window.donateAlert = function() {
-        // In a real app, you might copy to clipboard
         const address = "bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4";
         navigator.clipboard.writeText(address).then(() => {
             alert("BTC Address copied: " + address);
@@ -207,7 +203,6 @@
             alert("BTC: " + address);
         });
     };
-
 
     // ==================== ANIMATION LOOP ====================
     function resize() {
@@ -235,6 +230,38 @@
         resize();
         animate();
 
-        // 1. Wait for loading duration
+        // 1. Wait for loading duration (2 seconds)
         setTimeout(() => {
-            loadingOverlay.classList.add
+            // Hide Loading Text
+            loadingOverlay.classList.add('hidden');
+
+            // 2. Trigger Dragon Wipe (Fast Blackout)
+            setTimeout(() => {
+                dragonWipe.classList.add('active'); // Fade to Black (Fast)
+                
+                // 3. Initialize App while screen is black
+                setTimeout(() => {
+                    mainApp.classList.add('visible');
+                    initAppLogic();
+                }, 500);
+
+                // 4. Recover from Black (Slow Motion)
+                setTimeout(() => {
+                    dragonWipe.style.transition = "opacity 2.5s ease-out"; // Slow recovery
+                    dragonWipe.classList.remove('active'); // Fade back to normal
+                }, 1000);
+
+            }, 500);
+
+        }, CONFIG.loadingDuration);
+    }
+
+    // Events
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+    
+    // Start the experience
+    startSequence();
+
+});
