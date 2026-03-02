@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REVOLUTION | وثيقة التطبيع</title>
+    <title>TIME OUT</title>
     
-    <!-- Fonts: Oswald for Headings, Roboto Mono for Data -->
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300&family=Oswald:wght@300;500;700&family=Roboto+Mono:wght@300;400&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,10 +15,9 @@
     <!-- Loading Screen -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loader-icon">REV</div>
-        <div class="loading-text">Initializing System</div>
     </div>
 
-    <!-- Dragon Background -->
+    <!-- Background Canvas -->
     <canvas id="canvas"></canvas>
 
     <!-- Main Application -->
@@ -28,68 +27,109 @@
         <nav class="main-nav">
             <div class="logo">REVOLUTION</div>
             <div class="nav-links">
-                <button class="nav-btn active" data-page="home" onclick="navigateTo('home')">الرئيسية</button>
+                <!-- New Order as Requested -->
+                <button class="nav-btn active" data-page="home" onclick="navigateTo('home')">Main</button>
+                <button class="nav-btn" data-page="path" onclick="navigateTo('path')">طريق التحرر</button>
+                <button class="nav-btn" data-page="light" onclick="navigateTo('light')">Light</button>
                 <button class="nav-btn" data-page="countries" onclick="navigateTo('countries')">الدول</button>
                 <button class="nav-btn" data-page="palestine" onclick="navigateTo('palestine')">فلسطين</button>
                 <button class="nav-btn" data-page="sovereignty" onclick="navigateTo('sovereignty')">السيادة</button>
-                <button class="nav-btn" data-page="external" onclick="navigateTo('external')">الخارج</button>
+                <button class="nav-btn" data-page="external" onclick="navigateTo('external')">الأكاذيب</button>
             </div>
         </nav>
 
-        <!-- Pages -->
-        
-        <!-- HOME -->
+        <!-- HOME PAGE -->
         <div id="page-home" class="page-view active">
-            <h1 class="home-title">وثيقة <span>التطبيع</span></h1>
+            <h1 class="home-title">TIME OUT</h1>
             <p class="home-subtitle">
-                A comprehensive interactive archive documenting the stances of Arab nations. 
-                History is written by the victors, but the truth is remembered by the steadfast.
+                Whether you believe this is real or not, it will not change reality. 
+                Add your state, president, and all the forces and power of your state. 
+                You should believe that even if your state is so powerful and advanced, 
+                without you there is no them.
             </p>
-            <button class="cta-btn" onclick="navigateTo('countries')">Enter Archives</button>
+            <button class="cta-btn" onclick="navigateTo('path')">Start The Path</button>
         </div>
 
-        <!-- COUNTRIES -->
+        <!-- PATH TO LIBERATION PAGE (طريق التحرر) -->
+        <div id="page-path" class="page-view">
+            <div class="liberation-content">
+                <h1 style="font-size: 3rem; margin-bottom: 2rem; color: white;">طريق التحرر: دليل العودة إلى الفطرة</h1>
+                
+                <div class="step-box">
+                    <h2 class="step-title">قبل أن تبدأ: الحقيقة التي لا مفر منها</h2>
+                    <p>أنت اليوم عبد. نعم، أنت. عبد لشهواتك، عبد لمديرك، عبد للبنك، عبد للإعلام، عبد للدولة، عبد لعائلتك أحياناً. كل من تتبعه غير الله تجعله رباً تعبده. الحرية الحقيقية هي أن تكون عبداً لله فقط. لا لغيره. من كان عبداً لله، لا يمكن لأحد أن يستعبده بعد ذلك. هدفك الأسمى في هذه الحياة هو الجنة.</p>
+                </div>
+
+                <div class="step-box">
+                    <h2 class="step-title">الخطوة الأولى: السيادة الروحية والعقلية</h2>
+                    <p>اذهب إلى صفحة "النور". القرآن ليس كتاباً يُقرأ فقط. القرآن منجم أفكار. الله أنزله ليكون دستور حياة. أبو جهل لم يمت، بل تغير اسمه فقط. قوم لوط كانوا موجودين واليوم موجودون. القرآن حي يصلح لكل زمان.</p>
+                </div>
+
+                <div class="step-box">
+                    <h2 class="step-title">الخطوة الثانية: السيادة البيولوجية – تحرير الجسد</h2>
+                    <p>اذهب إلى صفحة "الأكاذيب" – صندوق "حرر جسدك". اجعله قلعة حصينة. الجسد أمانة ستسأل عنها. كلوا من الطيبات وابتعدوا عن الخبائث. الطعام المصنع (الخبيث) ليس فقط حراماً بل هو ضار بالجسد. الإسراف ليس فقط كثرة الأكل بل تناول ما يضرك.</p>
+                </div>
+
+                <div class="step-box">
+                    <h2 class="step-title">الخطوة الثالثة: بناء الرؤية العالمية</h2>
+                    <p>اذهب إلى كل الصفحات. انظر إلى ما يفعلون، لا إلى ما يقولون. في فلسطين: 42,000 قتيل. في الدول العربية: تطبيع واتفاقيات غاز. انظر إلى إسرائيل: تكنولوجيا بلا إنسانية هي وحش. القرآن هو الذي يمنعك أن تصبح هذا الوحش.</p>
+                </div>
+
+                <div class="step-box">
+                    <h2 class="step-title">الخاتمة</h2>
+                    <p>هذه رحلة عمرك. لن تصل إلى نهايتها أبداً. لا تصدقني. لا تصدق أحداً. تحقق بنفسك. ابنِ معرفتك بنفسك. واجعل القرآن دليلك.</p>
+                    <p style="margin-top: 1rem; color: var(--accent);">"لا تنظر إلى ما يقولون... انظر إلى ما يفعلون."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIGHT PAGE (Empty) -->
+        <div id="page-light" class="page-view">
+            <div class="section-header">
+                <h2 class="section-title">النور</h2>
+            </div>
+            <div style="height: 50vh; display: flex; align-items: center; justify-content: center; border: 1px solid #333;">
+                <p style="color: var(--muted); font-family: 'Roboto Mono';">CONTENT COMING SOON</p>
+            </div>
+        </div>
+
+        <!-- COUNTRIES PAGE -->
         <div id="page-countries" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">تاريخ الدول العربية</h2>
-                <div class="section-desc">Archives of Arab Nations</div>
             </div>
-            <main id="countries-container">
-                <!-- JS Injects Content -->
-            </main>
+            <main id="countries-container"></main>
         </div>
 
-        <!-- PALESTINE -->
+        <!-- PALESTINE PAGE -->
         <div id="page-palestine" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">فلسطين</h2>
-                <div class="section-desc">The Core</div>
             </div>
-            <div class="special-section">
-                <div id="palestine-grid" class="grid-container"></div>
-            </div>
+            <div id="palestine-grid" class="grid-container"></div>
         </div>
 
-        <!-- SOVEREIGNTY -->
+        <!-- SOVEREIGNTY PAGE -->
         <div id="page-sovereignty" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">السيادة المخطوفة</h2>
-                <div class="section-desc">Kidnapped Sovereignty</div>
             </div>
-            <div class="special-section">
-                <div id="sovereignty-grid" class="grid-container"></div>
-            </div>
+            <div id="sovereignty-grid" class="grid-container"></div>
         </div>
 
-        <!-- EXTERNAL -->
+        <!-- EXTERNAL PAGE -->
         <div id="page-external" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">الأكاذيب المسيطرة</h2>
-                <div class="section-desc">External Influence</div>
             </div>
-            <div class="special-section">
-                <div id="external-grid" class="grid-container"></div>
-            </div>
+            <div id="external-grid" class="grid-container"></div>
+        </div>
+
+        <!-- Donation Icon -->
+        <div class="donate-btn" onclick="openModal(102)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="none">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/>
+            </svg>
         </div>
 
     </div>
@@ -103,6 +143,5 @@
 
     <script src="data.js"></script>
     <script src="script.js"></script>
-
 </body>
 </html>
