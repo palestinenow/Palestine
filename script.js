@@ -3,104 +3,89 @@
 (function() {
     'use strict';
 
+    // ==================== DOM ELEMENTS ====================
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const mainApp = document.getElementById('main-app');
+    const dragonWipe = document.getElementById('dragon-wipe');
 
-    let width, height;
+    // ==================== CONFIGURATION ====================
+    const CONFIG = {
+        particleCount: 1000,
+        noiseScale: 0.005,
+        mouseRadius: 150,
+        fadeSpeed: 0.05,
+        loadingDuration: 2000, // 2 Seconds
+        palette: [
+            { r: 0, g: 122, b: 61 },    // Green
+            { r: 255, g: 255, b: 255 }, // White
+            { r: 30, g: 30, b: 35 },    // Near-black
+            { r: 206, g: 17, b: 38 }    // Red
+        ]
+    };
+
+    // ==================== STATE ====================
+    let width = 0, height = 0;
     let particles = [];
-    let dragonPassed = false; // Flag to check if dragon event happened
+    let time = 0;
+    const mouse = { x: null, y: null, radius: CONFIG.mouseRadius };
 
-    const mouse = { x: width/2, y: height/2 };
-
-    // Chinese Characters for Background
-    const chineseLetters = "道法自然天地人神鬼力量生老病死苦成败利钝兴衰存亡".split("");
-
-    // ==================== PARTICLE CLASS (Chinese Letters) ====================
-    class Particle {
-        constructor() {
-            this.reset();
+    // ==================== SIMPLEX NOISE ====================
+    // (Included directly for portability)
+    class SimplifiedNoise {
+        constructor() { this.p = new Array(512); const perm = new Array(256); for (let i = 0; i < 256; i++) perm[i] = Math.floor(Math.random() * 256); for (let i = 0; i < 512; i++) this.p[i] = perm[i & 255]; }
+        fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+        lerp(t, a, b) { return a + t * (b - a); }
+        grad(hash, x, y, z) { const h = hash & 15; const u = h < 8 ? x : y; const v = h < 4 ? y : h === 12 || h === 14 ? x : z; return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v); }
+        noise(x, y, z) {
+            const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
+            x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
+            const u = this.fade(x), v = this.fade(y), w = this.fade(z);
+            const A = this.p[X] + Y, AA = this.p[A] + Z, AB = this.p[A + 1] + Z, B = this.p[X + 1] + Y, BA = this.p[B] + Z, BB = this.p[B + 1] + Z;
+            return this.lerp(w, this.lerp(v, this.lerp(u, this.grad(this.p[AA], x, y, z), this.grad(this.p[BA], x - 1, y, z)), this.lerp(u, this.grad(this.p[AB], x, y - 1, z), this.grad(this.p[BB], x - 1, y - 1, z))), this.lerp(v, this.lerp(u, this.grad(this.p[AA + 1], x, y, z - 1), this.grad(this.p[BA + 1], x - 1, y, z - 1)), this.lerp(u, this.grad(this.p[AB + 1], x, y - 1, z - 1), this.grad(this.p[BB + 1], x - 1, y - 1, z - 1))));
         }
+    }
+    const noise = new SimplifiedNoise();
 
+    // ==================== PARTICLE CLASS ====================
+    class Particle {
+        constructor() { this.reset(); }
         reset() {
             this.x = Math.random() * width;
             this.y = Math.random() * height;
-            this.char = chineseLetters[Math.floor(Math.random() * chineseLetters.length)];
-            this.size = Math.random() * 10 + 8;
-            this.speedY = -Math.random() * 0.5 - 0.1;
-            this.opacity = Math.random() * 0.3 + 0.1;
+            this.vx = 0; this.vy = 0;
+            this.speed = Math.random() * 1.5 + 0.5;
+            this.size = Math.max(0.5, Math.random() * 1.5 + 0.5);
+            this.color = CONFIG.palette[Math.floor(Math.random() * CONFIG.palette.length)];
         }
-
         update() {
-            this.y += this.speedY;
-            
-            // Mouse interaction (move away slightly)
-            const dx = mouse.x - this.x;
-            const dy = mouse.y - this.y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            if(dist < 100) {
-                this.x -= dx * 0.02;
-                this.y -= dy * 0.02;
+            const angle = noise.noise(this.x * CONFIG.noiseScale, this.y * CONFIG.noiseScale, time * 0.0003) * Math.PI * 4;
+            let fx = Math.cos(angle) * this.speed;
+            let fy = Math.sin(angle) * this.speed;
+
+            if (mouse.x !== null && mouse.y !== null) {
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < mouse.radius && dist > 0) {
+                    const force = (mouse.radius - dist) / mouse.radius;
+                    const pushAngle = Math.atan2(dy, dx) + Math.PI / 2;
+                    fx += Math.cos(pushAngle) * force * 3;
+                    fy += Math.sin(pushAngle) * force * 3;
+                }
             }
-
-            if (this.y < -20) this.reset();
-            if (this.y > height + 20) this.reset();
+            this.vx += (fx - this.vx) * 0.1;
+            this.vy += (fy - this.vy) * 0.1;
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
         }
-
         draw() {
-            ctx.font = `${this.size}px 'Noto Sans SC', sans-serif`;
-            ctx.fillStyle = `rgba(185, 28, 28, ${this.opacity})`; // Red semi-transparent
-            ctx.fillText(this.char, this.x, this.y);
-        }
-    }
-
-    // ==================== DRAGON WIPE ANIMATION ====================
-    class BlackDragon {
-        constructor() {
-            this.x = width + 100;
-            this.speed = 50; // Very fast
-            this.width = 300; // Thickness of the dragon/body
-            this.active = true;
-        }
-
-        update() {
-            if (!this.active) return;
-            
-            this.x -= this.speed;
-
-            // When dragon passes center, trigger blackout
-            if (this.x < width / 2 && !dragonPassed) {
-                dragonPassed = true;
-                // Trigger recovery flash
-                setTimeout(() => {
-                    ctx.fillStyle = 'rgba(0,0,0,1)';
-                    ctx.fillRect(0,0,width,height);
-                }, 0);
-            }
-
-            // When dragon leaves screen
-            if (this.x < -500) {
-                this.active = false;
-            }
-        }
-
-        draw() {
-            if (!this.active) return;
-
-            ctx.fillStyle = '#000000';
-            // Draw dragon body (simplified black wave/shape)
+            const { r, g, b } = this.color;
             ctx.beginPath();
-            ctx.moveTo(this.x + this.width, 0);
-            
-            // Sine wave shape
-            for (let y = 0; y <= height; y += 20) {
-                const xOff = Math.sin(y * 0.02) * 50;
-                ctx.lineTo(this.x + xOff, y);
-            }
-            
-            ctx.lineTo(this.x + this.width, height);
-            ctx.closePath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
             ctx.fill();
         }
     }
@@ -122,7 +107,6 @@
                 setTimeout(() => target.classList.add('active'), 10);
                 window.scrollTo({ top: 0, behavior: 'instant' });
             }
-
             const btn = document.querySelector(`.nav-btn[data-page="${pageId}"]`);
             if (btn) btn.classList.add('active');
         };
@@ -143,13 +127,15 @@
             const section = document.createElement('section');
             section.className = 'level-section';
             section.innerHTML = `
-                <div class="level-title">${levelInfo.title}</div>
+                <div style="margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+                    <h3 style="font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase;">${levelInfo.title}</h3>
+                </div>
                 <div class="grid-container">
                     ${countries.map(c => `
                         <div class="country-card" onclick="openModal(${c.id})">
                             <div class="card-name">${c.name}</div>
                             <div class="card-sub">${c.subtitle || ''}</div>
-                            <div class="card-action">Access</div>
+                            <div class="card-action">View File</div>
                         </div>
                     `).join('')}
                 </div>
@@ -171,7 +157,7 @@
             <div class="country-card" onclick="openModal(${item.id})">
                 <div class="card-name">${item.name}</div>
                 <div class="card-sub">${item.subtitle || ''}</div>
-                <div class="card-action">View File</div>
+                <div class="card-action">Explore</div>
             </div>
         `).join('');
     }
@@ -185,14 +171,14 @@
         
         let content = item.events ? item.events.replace(/\n/g, '<br>') : '';
         let links = item.links && item.links.length > 0 
-            ? `<div class="links-list">${item.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join(' • ')}</div>` 
+            ? `<div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">${item.links.map(l => `<a href="${l.url}" target="_blank" style="color: var(--accent-green); text-decoration: none; margin-right: 10px;">${l.name}</a>`).join('')}</div>` 
             : '';
 
         body.innerHTML = `
             <button class="modal-close" onclick="closeModal()">×</button>
-            <div class="modal-header">
-                <div class="modal-title">${item.name}</div>
-                <div class="modal-subtitle">${item.subtitle || ''}</div>
+            <div style="margin-bottom: 2rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">${item.name}</div>
+                <div style="font-size: 0.9rem; color: var(--muted);">${item.subtitle || ''}</div>
             </div>
             <div class="data-body-text">${content}</div>
             ${links}
@@ -211,66 +197,44 @@
         if (e.target.id === 'detail-modal') closeModal();
     });
 
+    // Donation Function
+    window.donateAlert = function() {
+        // In a real app, you might copy to clipboard
+        const address = "bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4";
+        navigator.clipboard.writeText(address).then(() => {
+            alert("BTC Address copied: " + address);
+        }, () => {
+            alert("BTC: " + address);
+        });
+    };
+
 
     // ==================== ANIMATION LOOP ====================
-    let dragon;
-
     function resize() {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
-        
-        // Init Particles
         particles = [];
-        for(let i=0; i<50; i++) particles.push(new Particle());
-        
-        // Init Dragon
-        dragon = new BlackDragon();
+        for (let i = 0; i < CONFIG.particleCount; i++) particles.push(new Particle());
     }
 
     function animate() {
-        // Clear with fade effect
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
         ctx.fillRect(0, 0, width, height);
-
-        // Draw Particles (Chinese Letters)
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
-
-        // Draw Dragon
-        if (dragon && dragon.active) {
-            dragon.update();
-            dragon.draw();
+        ctx.globalCompositeOperation = 'lighter';
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
         }
-
+        ctx.globalCompositeOperation = 'source-over';
+        time++;
         requestAnimationFrame(animate);
     }
 
+    // ==================== LOADING & DRAGON SEQUENCE ====================
     function startSequence() {
         resize();
         animate();
 
-        // 1. Wait 3 seconds on loading
+        // 1. Wait for loading duration
         setTimeout(() => {
-            // 2. Hide Loading
-            loadingOverlay.classList.add('hidden');
-            
-            // 3. Trigger Dragon Animation immediately after load
-            // Dragon is automatically triggered in the loop now.
-            
-            // 4. Show Main App
-            setTimeout(() => {
-                mainApp.classList.add('visible');
-                initAppLogic();
-            }, 500);
-
-        }, 3000);
-    }
-
-    window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-    
-    startSequence();
-
-})();
+            loadingOverlay.classList.add
