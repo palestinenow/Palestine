@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>وثيقة التطبيع</title>
-    <meta name="description" content="وثيقة تفاعلية توثيقية شاملة لمواقف الدول العربية.">
+    <title>REVOLUTION | وثيقة التطبيع</title>
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Inter:wght@200;400;600&display=swap" rel="stylesheet">
+    <!-- Fonts: Oswald for Headings, Roboto Mono for Data -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Loading Overlay -->
+    <!-- Loading Screen -->
     <div class="loading-overlay" id="loadingOverlay">
-        <span class="loading-text">TADWEEN</span>
+        <div class="loader-icon">REV</div>
+        <div class="loading-text">Initializing System</div>
     </div>
 
-    <!-- Flow Field Canvas -->
+    <!-- Dragon Background -->
     <canvas id="canvas"></canvas>
 
     <!-- Main Application -->
@@ -26,26 +26,33 @@
         
         <!-- Navigation -->
         <nav class="main-nav">
-            <button class="nav-btn active" data-page="home" onclick="navigateTo('home')">الرئيسية</button>
-            <button class="nav-btn" data-page="countries" onclick="navigateTo('countries')">تاريخ الدول</button>
-            <button class="nav-btn" data-page="palestine" onclick="navigateTo('palestine')">فلسطين</button>
-            <button class="nav-btn" data-page="sovereignty" onclick="navigateTo('sovereignty')">السيادة</button>
-            <button class="nav-btn" data-page="external" onclick="navigateTo('external')">الأكاذيب</button>
+            <div class="logo">REVOLUTION</div>
+            <div class="nav-links">
+                <button class="nav-btn active" data-page="home" onclick="navigateTo('home')">الرئيسية</button>
+                <button class="nav-btn" data-page="countries" onclick="navigateTo('countries')">الدول</button>
+                <button class="nav-btn" data-page="palestine" onclick="navigateTo('palestine')">فلسطين</button>
+                <button class="nav-btn" data-page="sovereignty" onclick="navigateTo('sovereignty')">السيادة</button>
+                <button class="nav-btn" data-page="external" onclick="navigateTo('external')">الخارج</button>
+            </div>
         </nav>
 
         <!-- Pages -->
         
         <!-- HOME -->
         <div id="page-home" class="page-view active">
-            <h1 class="home-title">وثيقة التطبيع</h1>
-            <p class="home-subtitle">Interactive Documentation Project</p>
+            <h1 class="home-title">وثيقة <span>التطبيع</span></h1>
+            <p class="home-subtitle">
+                A comprehensive interactive archive documenting the stances of Arab nations. 
+                History is written by the victors, but the truth is remembered by the steadfast.
+            </p>
+            <button class="cta-btn" onclick="navigateTo('countries')">Enter Archives</button>
         </div>
 
         <!-- COUNTRIES -->
         <div id="page-countries" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">تاريخ الدول العربية</h2>
-                <p class="section-desc">Archives of Arab Nations</p>
+                <div class="section-desc">Archives of Arab Nations</div>
             </div>
             <main id="countries-container">
                 <!-- JS Injects Content -->
@@ -56,7 +63,7 @@
         <div id="page-palestine" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">فلسطين</h2>
-                <p class="section-desc">The Land • The People • The Resistance</p>
+                <div class="section-desc">The Core</div>
             </div>
             <div class="special-section">
                 <div id="palestine-grid" class="grid-container"></div>
@@ -67,7 +74,7 @@
         <div id="page-sovereignty" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">السيادة المخطوفة</h2>
-                <p class="section-desc">When Independence is Traded</p>
+                <div class="section-desc">Kidnapped Sovereignty</div>
             </div>
             <div class="special-section">
                 <div id="sovereignty-grid" class="grid-container"></div>
@@ -78,15 +85,12 @@
         <div id="page-external" class="page-view">
             <div class="section-header">
                 <h2 class="section-title">الأكاذيب المسيطرة</h2>
-                <p class="section-desc">Control Tools</p>
+                <div class="section-desc">External Influence</div>
             </div>
             <div class="special-section">
                 <div id="external-grid" class="grid-container"></div>
             </div>
         </div>
-
-        <!-- DONATE BUTTON -->
-        <button class="donate-btn" onclick="openModal(102)">Support</button>
 
     </div>
 
@@ -97,7 +101,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="data.js"></script>
     <script src="script.js"></script>
 
