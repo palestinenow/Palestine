@@ -5,27 +5,536 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Samud | Palestine</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Inter:wght@200&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --bg: #050505;
+            --fg: #ffffff;
+            --accent-green: #007a3d;
+            --accent-red: #ce1126;
+            --muted: rgba(255, 255, 255, 0.4);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg);
+            overflow: hidden;
+            color: var(--fg);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ==================== LOADING OVERLAY ==================== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+            pointer-events: none;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+        }
+
+        .loading-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            color: var(--fg);
+            opacity: 0;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loadingPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* ==================== CANVAS ==================== */
+        #canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* ==================== MAIN OVERLAY ==================== */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .title-container {
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+        }
+
+        .title-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(4rem, 12vw, 12rem);
+            margin: 0;
+            letter-spacing: 0.1em;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 80px rgba(255, 255, 255, 0.15);
+        }
+
+        h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(0.75rem, 1.5vw, 1rem);
+            font-weight: 200;
+            letter-spacing: 0.8em;
+            text-transform: uppercase;
+            margin-top: 24px;
+            color: var(--muted);
+        }
+
+        /* ==================== FLAG SYMBOL ==================== */
+        .flag-symbol {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 48px;
+            height: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            cursor: pointer;
+            z-index: 20;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            background: rgba(5, 5, 5, 0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        .flag-symbol.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .flag-symbol:hover {
+            transform: scale(1.15);
+            border-color: var(--accent-green);
+            box-shadow: 0 0 30px rgba(0, 122, 61, 0.3);
+        }
+
+        .flag-symbol:active {
+            transform: scale(0.95);
+        }
+
+        .flag-symbol:focus-visible {
+            outline: 2px solid var(--accent-green);
+            outline-offset: 3px;
+        }
+
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 16px solid rgba(255, 255, 255, 0.85);
+            margin-left: 3px;
+            transition: border-bottom-color 0.3s ease;
+        }
+
+        .flag-symbol:hover .triangle {
+            border-bottom-color: var(--accent-green);
+        }
+
+        /* ==================== REDUCED MOTION ==================== */
+        @media (prefers-reduced-motion: reduce) {
+            .loading-text {
+                animation: none;
+                opacity: 1;
+            }
+            
+            .loading-overlay {
+                transition: opacity 0.01s;
+            }
+            
+            .title-container,
+            .flag-symbol {
+                transition: opacity 0.01s, transform 0.01s;
+            }
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 480px) {
+            .flag-symbol {
+                bottom: 24px;
+                right: 24px;
+                width: 44px;
+                height: 44px;
+            }
+            
+            h2 {
+                letter-spacing: 0.4em;
+                padding: 0 20px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <span class="loading-text">SAMUD</span>
+    </div>
 
-    <!-- The Canvas for the background animation -->
+    <!-- Canvas Background -->
     <canvas id="canvas"></canvas>
 
-    <!-- Main Content Overlay -->
+    <!-- Main Content -->
     <div class="overlay">
-        <div class="title-container">
+        <div class="title-container" id="titleContainer">
             <h1>PALESTINE</h1>
             <h2>Eternal Spirit</h2>
         </div>
     </div>
 
     <!-- Interactive Symbol -->
-    <div class="flag-symbol" onclick="location.reload()">
+    <button class="flag-symbol" id="flagSymbol" aria-label="Reload page" tabindex="0">
         <div class="triangle"></div>
-    </div>
+    </button>
 
-    <!-- Link to the separate background script -->
-    <script src="back.js"></script>
+    <script>
+        /**
+         * SAMUD ENGINE - Palestine Tribute
+         * Flow field particle system with mouse interaction
+         */
+
+        (function() {
+            'use strict';
+
+            // ==================== DOM ELEMENTS ====================
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const titleContainer = document.getElementById('titleContainer');
+            const flagSymbol = document.getElementById('flagSymbol');
+
+            // ==================== CONFIGURATION ====================
+            const CONFIG = {
+                particleCount: 1000,
+                noiseScale: 0.005,
+                mouseRadius: 150,
+                fadeSpeed: 0.05,
+                loadingDuration: 2000,
+                palette: [
+                    { r: 0, g: 122, b: 61 },    // Green
+                    { r: 255, g: 255, b: 255 }, // White
+                    { r: 30, g: 30, b: 35 },    // Near-black
+                    { r: 206, g: 17, b: 38 }    // Red
+                ]
+            };
+
+            // ==================== STATE ====================
+            let width = 0;
+            let height = 0;
+            let particles = [];
+            let time = 0;
+            let animationId = null;
+
+            const mouse = {
+                x: null,
+                y: null,
+                radius: CONFIG.mouseRadius
+            };
+
+            // ==================== SIMPLEX NOISE ====================
+            class SimplifiedNoise {
+                constructor() {
+                    this.p = new Array(512);
+                    const perm = new Array(256);
+                    for (let i = 0; i < 256; i++) {
+                        perm[i] = Math.floor(Math.random() * 256);
+                    }
+                    for (let i = 0; i < 512; i++) {
+                        this.p[i] = perm[i & 255];
+                    }
+                }
+
+                fade(t) {
+                    return t * t * t * (t * (t * 6 - 15) + 10);
+                }
+
+                lerp(t, a, b) {
+                    return a + t * (b - a);
+                }
+
+                grad(hash, x, y, z) {
+                    const h = hash & 15;
+                    const u = h < 8 ? x : y;
+                    const v = h < 4 ? y : h === 12 || h === 14 ? x : z;
+                    return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+                }
+
+                noise(x, y, z) {
+                    const X = Math.floor(x) & 255;
+                    const Y = Math.floor(y) & 255;
+                    const Z = Math.floor(z) & 255;
+
+                    x -= Math.floor(x);
+                    y -= Math.floor(y);
+                    z -= Math.floor(z);
+
+                    const u = this.fade(x);
+                    const v = this.fade(y);
+                    const w = this.fade(z);
+
+                    const A = this.p[X] + Y;
+                    const AA = this.p[A] + Z;
+                    const AB = this.p[A + 1] + Z;
+                    const B = this.p[X + 1] + Y;
+                    const BA = this.p[B] + Z;
+                    const BB = this.p[B + 1] + Z;
+
+                    return this.lerp(
+                        w,
+                        this.lerp(
+                            v,
+                            this.lerp(
+                                u,
+                                this.grad(this.p[AA], x, y, z),
+                                this.grad(this.p[BA], x - 1, y, z)
+                            ),
+                            this.lerp(
+                                u,
+                                this.grad(this.p[AB], x, y - 1, z),
+                                this.grad(this.p[BB], x - 1, y - 1, z)
+                            )
+                        ),
+                        this.lerp(
+                            v,
+                            this.lerp(
+                                u,
+                                this.grad(this.p[AA + 1], x, y, z - 1),
+                                this.grad(this.p[BA + 1], x - 1, y, z - 1)
+                            ),
+                            this.lerp(
+                                u,
+                                this.grad(this.p[AB + 1], x, y - 1, z - 1),
+                                this.grad(this.p[BB + 1], x - 1, y - 1, z - 1)
+                            )
+                        )
+                    );
+                }
+            }
+
+            const noise = new SimplifiedNoise();
+
+            // ==================== PARTICLE CLASS ====================
+            class Particle {
+                constructor() {
+                    this.x = 0;
+                    this.y = 0;
+                    this.vx = 0;
+                    this.vy = 0;
+                    this.speed = 0;
+                    this.size = 0;
+                    this.color = null;
+                    this.reset();
+                }
+
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = 0;
+                    this.vy = 0;
+                    this.speed = Math.random() * 1.5 + 0.5;
+                    this.size = Math.max(0.5, Math.random() * 1.5 + 0.5);
+                    this.color = CONFIG.palette[Math.floor(Math.random() * CONFIG.palette.length)];
+                }
+
+                update() {
+                    // Flow field force
+                    const angle = noise.noise(
+                        this.x * CONFIG.noiseScale,
+                        this.y * CONFIG.noiseScale,
+                        time * 0.0003
+                    ) * Math.PI * 4;
+
+                    let fx = Math.cos(angle) * this.speed;
+                    let fy = Math.sin(angle) * this.speed;
+
+                    // Mouse interaction
+                    if (mouse.x !== null && mouse.y !== null) {
+                        const dx = mouse.x - this.x;
+                        const dy = mouse.y - this.y;
+                        const distSq = dx * dx + dy * dy;
+                        const dist = Math.sqrt(distSq);
+
+                        if (dist < mouse.radius && dist > 0) {
+                            const force = (mouse.radius - dist) / mouse.radius;
+                            const pushAngle = Math.atan2(dy, dx) + Math.PI / 2;
+                            fx += Math.cos(pushAngle) * force * 3;
+                            fy += Math.sin(pushAngle) * force * 3;
+                        }
+                    }
+
+                    this.vx += (fx - this.vx) * 0.1;
+                    this.vy += (fy - this.vy) * 0.1;
+
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Boundary check
+                    if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+                        this.reset();
+                    }
+                }
+
+                draw() {
+                    const { r, g, b } = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
+                    ctx.fill();
+                }
+            }
+
+            // ==================== INITIALIZATION ====================
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < CONFIG.particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                initParticles();
+            }
+
+            // ==================== ANIMATION ====================
+            function animate() {
+                // Ghosting effect
+                ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
+                ctx.fillRect(0, 0, width, height);
+
+                // Light blending
+                ctx.globalCompositeOperation = 'lighter';
+
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+
+                ctx.globalCompositeOperation = 'source-over';
+
+                time++;
+                animationId = requestAnimationFrame(animate);
+            }
+
+            // ==================== EVENT HANDLERS ====================
+            function handleMouseMove(e) {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            }
+
+            function handleMouseLeave() {
+                mouse.x = null;
+                mouse.y = null;
+            }
+
+            function handleFlagClick() {
+                location.reload();
+            }
+
+            // ==================== LOADING SEQUENCE ====================
+            function startLoadingSequence() {
+                setTimeout(function() {
+                    // Hide loading overlay
+                    loadingOverlay.classList.add('hidden');
+
+                    // Show title after small delay
+                    setTimeout(function() {
+                        titleContainer.classList.add('visible');
+                    }, 200);
+
+                    // Show flag symbol
+                    setTimeout(function() {
+                        flagSymbol.classList.add('visible');
+                    }, 600);
+
+                }, CONFIG.loadingDuration);
+            }
+
+            // ==================== SETUP ====================
+            function init() {
+                // Set up canvas
+                resize();
+
+                // Event listeners
+                window.addEventListener('resize', resize);
+                window.addEventListener('mousemove', handleMouseMove);
+                window.addEventListener('mouseleave', handleMouseLeave);
+                flagSymbol.addEventListener('click', handleFlagClick);
+
+                // Keyboard accessibility for flag button
+                flagSymbol.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleFlagClick();
+                    }
+                });
+
+                // Start animation
+                animate();
+
+                // Start loading sequence
+                startLoadingSequence();
+            }
+
+            // Wait for DOM
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
 </body>
 </html>
