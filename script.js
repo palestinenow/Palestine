@@ -3,125 +3,105 @@
 (function() {
     'use strict';
 
-    // ==================== CONFIGURATION ====================
-    const CONFIG = {
-        loadingDuration: 3000, // 3 Seconds
-        dragonSegments: 80,
-        numbersCount: 30
-    };
-
-    // ==================== DOM ELEMENTS ====================
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const mainApp = document.getElementById('main-app');
 
     let width, height;
-    let animationId;
+    let particles = [];
+    let dragonPassed = false; // Flag to check if dragon event happened
+
     const mouse = { x: width/2, y: height/2 };
 
-    // ==================== SHADOW DRAGON CLASS ====================
-    class ShadowDragon {
-        constructor() {
-            this.segments = [];
-            this.numbers = [];
-            
-            // Init Segments
-            for(let i=0; i<CONFIG.dragonSegments; i++) {
-                this.segments.push({
-                    x: width/2, 
-                    y: height/2,
-                    size: Math.max(1, 20 - i * 0.2) // Head is largest
-                });
-            }
+    // Chinese Characters for Background
+    const chineseLetters = "道法自然天地人神鬼力量生老病死苦成败利钝兴衰存亡".split("");
 
-            // Init Floating Numbers
-            for(let i=0; i<CONFIG.numbersCount; i++) {
-                this.numbers.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    val: Math.floor(Math.random() * 80) + 20, // 20-100
-                    speed: Math.random() * 0.5 + 0.1,
-                    opacity: Math.random()
-                });
-            }
+    // ==================== PARTICLE CLASS (Chinese Letters) ====================
+    class Particle {
+        constructor() {
+            this.reset();
+        }
+
+        reset() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.char = chineseLetters[Math.floor(Math.random() * chineseLetters.length)];
+            this.size = Math.random() * 10 + 8;
+            this.speedY = -Math.random() * 0.5 - 0.1;
+            this.opacity = Math.random() * 0.3 + 0.1;
         }
 
         update() {
-            // Move Head towards mouse
-            const head = this.segments[0];
-            const dx = mouse.x - head.x;
-            const dy = mouse.y - head.y;
+            this.y += this.speedY;
             
-            // Easing
-            head.x += dx * 0.05;
-            head.y += dy * 0.05;
-
-            // Move Body (Follow the leader)
-            for (let i = 1; i < this.segments.length; i++) {
-                const prev = this.segments[i-1];
-                const curr = this.segments[i];
-                
-                const angle = Math.atan2(prev.y - curr.y, prev.x - curr.x);
-                const dist = 5; // Tightness of the dragon
-                
-                curr.x = prev.x - Math.cos(angle) * dist;
-                curr.y = prev.y - Math.sin(angle) * dist;
+            // Mouse interaction (move away slightly)
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if(dist < 100) {
+                this.x -= dx * 0.02;
+                this.y -= dy * 0.02;
             }
 
-            // Update Floating Numbers
-            this.numbers.forEach(n => {
-                n.y -= n.speed;
-                n.opacity -= 0.002;
-                
-                // Reset if faded or off screen
-                if (n.opacity <= 0 || n.y < 0) {
-                    n.y = height + 20;
-                    n.x = Math.random() * width;
-                    n.opacity = 0.5 + Math.random() * 0.5;
-                    n.val = Math.floor(Math.random() * 80) + 20;
-                }
-            });
+            if (this.y < -20) this.reset();
+            if (this.y > height + 20) this.reset();
         }
 
         draw() {
-            // Draw Dragon Body
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)'; // Solid black shadow
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
+            ctx.font = `${this.size}px 'Noto Sans SC', sans-serif`;
+            ctx.fillStyle = `rgba(185, 28, 28, ${this.opacity})`; // Red semi-transparent
+            ctx.fillText(this.char, this.x, this.y);
+        }
+    }
 
-            // Start path
-            if (this.segments.length > 0) {
-                ctx.moveTo(this.segments[0].x, this.segments[0].y);
-                
-                // Draw smooth curve through points
-                for (let i = 1; i < this.segments.length - 2; i++) {
-                    const xc = (this.segments[i].x + this.segments[i + 1].x) / 2;
-                    const yc = (this.segments[i].y + this.segments[i + 1].y) / 2;
-                    ctx.quadraticCurveTo(this.segments[i].x, this.segments[i].y, xc, yc);
-                }
-                
-                ctx.stroke();
+    // ==================== DRAGON WIPE ANIMATION ====================
+    class BlackDragon {
+        constructor() {
+            this.x = width + 100;
+            this.speed = 50; // Very fast
+            this.width = 300; // Thickness of the dragon/body
+            this.active = true;
+        }
+
+        update() {
+            if (!this.active) return;
+            
+            this.x -= this.speed;
+
+            // When dragon passes center, trigger blackout
+            if (this.x < width / 2 && !dragonPassed) {
+                dragonPassed = true;
+                // Trigger recovery flash
+                setTimeout(() => {
+                    ctx.fillStyle = 'rgba(0,0,0,1)';
+                    ctx.fillRect(0,0,width,height);
+                }, 0);
             }
 
-            // Draw Head Glow (Scary Eye effect)
-            const head = this.segments[0];
-            ctx.beginPath();
-            ctx.arc(head.x, head.y, 8, 0, Math.PI * 2);
-            ctx.fillStyle = '#b91c1c'; // Red Eye
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = "#b91c1c";
-            ctx.fill();
-            ctx.shadowBlur = 0;
+            // When dragon leaves screen
+            if (this.x < -500) {
+                this.active = false;
+            }
+        }
 
-            // Draw Floating Numbers
-            ctx.font = "12px 'Roboto Mono'";
-            this.numbers.forEach(n => {
-                ctx.fillStyle = `rgba(185, 28, 28, ${n.opacity})`; // Red numbers
-                ctx.fillText(n.val, n.x, n.y);
-            });
+        draw() {
+            if (!this.active) return;
+
+            ctx.fillStyle = '#000000';
+            // Draw dragon body (simplified black wave/shape)
+            ctx.beginPath();
+            ctx.moveTo(this.x + this.width, 0);
+            
+            // Sine wave shape
+            for (let y = 0; y <= height; y += 20) {
+                const xOff = Math.sin(y * 0.02) * 50;
+                ctx.lineTo(this.x + xOff, y);
+            }
+            
+            ctx.lineTo(this.x + this.width, height);
+            ctx.closePath();
+            ctx.fill();
         }
     }
 
@@ -129,26 +109,17 @@
     function initAppLogic() {
         if (typeof levels === 'undefined') return;
 
-        // Navigation Fix
         window.navigateTo = function(pageId) {
-            // 1. Hide all views
             document.querySelectorAll('.page-view').forEach(el => {
                 el.classList.remove('active');
-                // Critical: Force display none to prevent layout thrashing
-                el.style.display = 'none'; 
+                el.style.display = 'none';
             });
-
-            // 2. Deactivate buttons
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
-            // 3. Show target view
             const target = document.getElementById(`page-${pageId}`);
             if (target) {
-                target.style.display = 'block'; // Force display block first
-                // Small delay to trigger transition
+                target.style.display = 'block';
                 setTimeout(() => target.classList.add('active'), 10);
-                
-                // Scroll to top instantly
                 window.scrollTo({ top: 0, behavior: 'instant' });
             }
 
@@ -164,23 +135,21 @@
         if(!container) return;
         container.innerHTML = '';
 
-        // Render Levels
         for (let i = 1; i <= 5; i++) {
             const levelInfo = levels[i];
             const countries = countriesData.filter(c => c.level === i);
             if (countries.length === 0) continue;
 
             const section = document.createElement('section');
-            section.className = 'level-section fade-in';
+            section.className = 'level-section';
             section.innerHTML = `
                 <div class="level-title">${levelInfo.title}</div>
-                <p style="font-family:'Roboto Mono'; font-size:0.8rem; color:var(--muted); margin-bottom:1rem;">${levelInfo.desc}</p>
                 <div class="grid-container">
                     ${countries.map(c => `
                         <div class="country-card" onclick="openModal(${c.id})">
                             <div class="card-name">${c.name}</div>
-                            <div class="card-sub">${c.subtitle || 'Classified'}</div>
-                            <div class="card-action">Access File</div>
+                            <div class="card-sub">${c.subtitle || ''}</div>
+                            <div class="card-action">Access</div>
                         </div>
                     `).join('')}
                 </div>
@@ -188,7 +157,7 @@
             container.appendChild(section);
         }
 
-        // Special Grids
+        // Render Special Sections
         renderSpecial('palestine', 'palestine-grid', countriesData.filter(c => c.id === 100));
         renderSpecial('sovereignty', 'sovereignty-grid', countriesData.filter(c => c.id >= 101 && c.id < 200));
         renderSpecial('external', 'external-grid', countriesData.filter(c => c.id >= 200));
@@ -202,7 +171,7 @@
             <div class="country-card" onclick="openModal(${item.id})">
                 <div class="card-name">${item.name}</div>
                 <div class="card-sub">${item.subtitle || ''}</div>
-                <div class="card-action">Read More</div>
+                <div class="card-action">View File</div>
             </div>
         `).join('');
     }
@@ -214,22 +183,16 @@
         const modal = document.getElementById('detail-modal');
         const body = document.getElementById('modal-body');
         
-        let content = item.events ? item.events.replace(/\n/g, '<br>') : 'No data available.';
-        content = content.replace(/الحدث:/g, '<span class="label-event">EVENT:</span>');
-
-        let links = '';
-        if(item.links && item.links.length > 0) {
-            links = `<div class="links-list">
-                <strong>Sources:</strong> 
-                ${item.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join(' • ')}
-            </div>`;
-        }
+        let content = item.events ? item.events.replace(/\n/g, '<br>') : '';
+        let links = item.links && item.links.length > 0 
+            ? `<div class="links-list">${item.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join(' • ')}</div>` 
+            : '';
 
         body.innerHTML = `
             <button class="modal-close" onclick="closeModal()">×</button>
             <div class="modal-header">
                 <div class="modal-title">${item.name}</div>
-                <div class="modal-subtitle">${item.subtitle || 'Classified File'}</div>
+                <div class="modal-subtitle">${item.subtitle || ''}</div>
             </div>
             <div class="data-body-text">${content}</div>
             ${links}
@@ -255,41 +218,59 @@
     function resize() {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
-        dragon = new ShadowDragon();
+        
+        // Init Particles
+        particles = [];
+        for(let i=0; i<50; i++) particles.push(new Particle());
+        
+        // Init Dragon
+        dragon = new BlackDragon();
     }
 
     function animate() {
-        // Clear with trail effect
-        ctx.fillStyle = 'rgba(8, 8, 8, 0.2)'; // Matches --bg with fade
+        // Clear with fade effect
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
         ctx.fillRect(0, 0, width, height);
 
-        dragon.update();
-        dragon.draw();
+        // Draw Particles (Chinese Letters)
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
 
-        animationId = requestAnimationFrame(animate);
+        // Draw Dragon
+        if (dragon && dragon.active) {
+            dragon.update();
+            dragon.draw();
+        }
+
+        requestAnimationFrame(animate);
     }
 
-    // ==================== STARTUP ====================
     function startSequence() {
         resize();
         animate();
 
+        // 1. Wait 3 seconds on loading
         setTimeout(() => {
+            // 2. Hide Loading
             loadingOverlay.classList.add('hidden');
             
+            // 3. Trigger Dragon Animation immediately after load
+            // Dragon is automatically triggered in the loop now.
+            
+            // 4. Show Main App
             setTimeout(() => {
                 mainApp.classList.add('visible');
                 initAppLogic();
-            }, 300);
+            }, 500);
 
-        }, CONFIG.loadingDuration);
+        }, 3000);
     }
 
-    // Events
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
     
-    // Start
     startSequence();
 
 })();
