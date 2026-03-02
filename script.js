@@ -16,8 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
         particleCount: 800,
         noiseScale: 0.005,
         mouseRadius: 150,
-        fadeSpeed: 0.15, // FIX: Increased from 0.05 to 0.15 to clear grey trails faster
-        cleanupTime: 4000, // 4 seconds
+        trailAlpha: 0.05,     // Low alpha for trails during animation
+        solidClearAlpha: 1.0, // Solid black to clear grey residue
+        animationDuration: 5000, // 5 seconds of animation
         loadingDuration: 2000, 
         palette: [
             { r: 0, g: 122, b: 61 },    // Green
@@ -83,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
         draw() {
             const { r, g, b } = this.color;
             ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${r},${g},${b},0.5)`; ctx.fill();
+            ctx.fillStyle = `rgba(${r},${g},${b},0.6)`; ctx.fill();
         }
     }
 
@@ -257,20 +258,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ==================== ANIMATION LOOP ====================
+    // ==================== ANIMATION LOOP (FIXED) ====================
     function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; particles = []; for (let i = 0; i < CONFIG.particleCount; i++) particles.push(new Particle()); }
 
     function animate() {
-        // Using higher alpha (0.15) to clear trails and prevent grey buildup
-        if (time > CONFIG.cleanupTime) ctx.fillStyle = 'rgba(5, 5, 5, 0.15)'; 
-        else ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
+        // Logic:
+        // 1. First 5 seconds: Draw trails.
+        // 2. After 5 seconds: Clear to solid black to remove grey trails, stop drawing particles.
         
-        ctx.fillRect(0, 0, width, height);
-        if (time < CONFIG.cleanupTime + 200) {
+        if (time < CONFIG.animationDuration) {
+            // Phase 1: Trail Effect
+            ctx.fillStyle = `rgba(5,5,5,${CONFIG.trailAlpha})`; 
+            ctx.fillRect(0, 0, width, height);
+            
             ctx.globalCompositeOperation = 'lighter';
             for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); }
             ctx.globalCompositeOperation = 'source-over';
+        } else {
+            // Phase 2: Clean Up
+            // We check if we are already solid black to save performance, 
+            // but we redraw black for a few frames to ensure the grey is gone.
+            if (time < CONFIG.animationDuration + 100) { 
+                ctx.fillStyle = `rgba(5,5,5,${CONFIG.solidClearAlpha})`; 
+                ctx.fillRect(0, 0, width, height);
+            }
+            // Stop updating/drawing particles after animation duration
         }
+
         time++; requestAnimationFrame(animate);
     }
 
