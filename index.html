@@ -1,540 +1,193 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samud | Palestine</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Inter:wght@200&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #050505;
-            --fg: #ffffff;
-            --accent-green: #007a3d;
-            --accent-red: #ce1126;
-            --muted: rgba(255, 255, 255, 0.4);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تاريخ الدول العربية | وثيقة التطبيع</title>
+  <meta name="description" content="وثيقة تفاعلية توثيقية شاملة لمواقف الدول العربية من الكيان الصهيوني وقضية فلسطين.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body,
-        html {
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg);
-            overflow: hidden;
-            color: var(--fg);
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* ==================== LOADING OVERLAY ==================== */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 1;
-            transition: opacity 0.8s ease-out;
-            pointer-events: none;
-        }
-
-        .loading-overlay.hidden {
-            opacity: 0;
-        }
-
-        .loading-text {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(1.5rem, 4vw, 3rem);
-            font-weight: 300;
-            letter-spacing: 0.3em;
-            color: var(--fg);
-            opacity: 0;
-            animation: loadingPulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes loadingPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-
-        /* ==================== CANVAS ==================== */
-        #canvas {
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        /* ==================== MAIN OVERLAY ==================== */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none;
-            z-index: 10;
-            text-align: center;
-        }
-
-        .title-container {
-            position: relative;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 1.2s ease-out, transform 1.2s ease-out;
-        }
-
-        .title-container.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(4rem, 12vw, 12rem);
-            margin: 0;
-            letter-spacing: 0.1em;
-            font-weight: 300;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 0 80px rgba(255, 255, 255, 0.15);
-        }
-
-        h2 {
-            font-family: 'Inter', sans-serif;
-            font-size: clamp(0.75rem, 1.5vw, 1rem);
-            font-weight: 200;
-            letter-spacing: 0.8em;
-            text-transform: uppercase;
-            margin-top: 24px;
-            color: var(--muted);
-        }
-
-        /* ==================== FLAG SYMBOL ==================== */
-        .flag-symbol {
-            position: fixed;
-            bottom: 40px;
-            right: 40px;
-            width: 48px;
-            height: 48px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: auto;
-            cursor: pointer;
-            z-index: 20;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            background: rgba(5, 5, 5, 0.5);
-            backdrop-filter: blur(8px);
-        }
-
-        .flag-symbol.visible {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .flag-symbol:hover {
-            transform: scale(1.15);
-            border-color: var(--accent-green);
-            box-shadow: 0 0 30px rgba(0, 122, 61, 0.3);
-        }
-
-        .flag-symbol:active {
-            transform: scale(0.95);
-        }
-
-        .flag-symbol:focus-visible {
-            outline: 2px solid var(--accent-green);
-            outline-offset: 3px;
-        }
-
-        .triangle {
-            width: 0;
-            height: 0;
-            border-left: 9px solid transparent;
-            border-right: 9px solid transparent;
-            border-bottom: 16px solid rgba(255, 255, 255, 0.85);
-            margin-left: 3px;
-            transition: border-bottom-color 0.3s ease;
-        }
-
-        .flag-symbol:hover .triangle {
-            border-bottom-color: var(--accent-green);
-        }
-
-        /* ==================== REDUCED MOTION ==================== */
-        @media (prefers-reduced-motion: reduce) {
-            .loading-text {
-                animation: none;
-                opacity: 1;
-            }
-            
-            .loading-overlay {
-                transition: opacity 0.01s;
-            }
-            
-            .title-container,
-            .flag-symbol {
-                transition: opacity 0.01s, transform 0.01s;
-            }
-        }
-
-        /* ==================== RESPONSIVE ==================== */
-        @media (max-width: 480px) {
-            .flag-symbol {
-                bottom: 24px;
-                right: 24px;
-                width: 44px;
-                height: 44px;
-            }
-            
-            h2 {
-                letter-spacing: 0.4em;
-                padding: 0 20px;
-            }
-        }
-    </style>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <span class="loading-text">SAMUD</span>
-    </div>
 
-    <!-- Canvas Background -->
-    <canvas id="canvas"></canvas>
+  <!-- Matrix Canvas Background (Visible behind everything) -->
+  <canvas id="matrix-canvas"></canvas>
+  
+  <!-- Custom Cursor -->
+  <div class="matrix-cursor" id="cursor"></div>
 
-    <!-- Main Content -->
-    <div class="overlay">
-        <div class="title-container" id="titleContainer">
-            <h1>PALESTINE</h1>
-            <h2>Eternal Spirit</h2>
-        </div>
-    </div>
-
-    <!-- Interactive Symbol -->
-    <button class="flag-symbol" id="flagSymbol" aria-label="Reload page" tabindex="0">
+  <!-- SPLASH SCREEN -->
+  <div id="splash-screen">
+    <h1>وثيقة التطبيع</h1>
+    <h2>SYSTEM INITIALIZING</h2>
+    <div class="flag-symbol" onclick="document.getElementById('splash-screen').classList.add('hidden'); document.getElementById('main-app').classList.add('visible');">
         <div class="triangle"></div>
-    </button>
+    </div>
+  </div>
 
-    <script>
-        /**
-         * SAMUD ENGINE - Palestine Tribute
-         * Flow field particle system with mouse interaction
-         */
+  <!-- MAIN APPLICATION -->
+  <div id="main-app">
+      
+      <!-- Palestine Flag Top Bar -->
+      <div class="palestine-gradient"></div>
 
-        (function() {
-            'use strict';
+      <!-- Navigation Bar -->
+      <nav class="main-nav">
+        <button class="nav-btn active" data-page="home" onclick="navigateTo('home')">الرئيسية</button>
+        <button class="nav-btn" data-page="countries" onclick="navigateTo('countries')">تاريخ الدول</button>
+        <button class="nav-btn" data-page="palestine" onclick="navigateTo('palestine')">فلسطين</button>
+        <button class="nav-btn" data-page="sovereignty" onclick="navigateTo('sovereignty')">السيادة المخطوفة</button>
+        <button class="nav-btn" data-page="external" onclick="navigateTo('external')">الأكاذيب المسيطرة</button>
+        <button class="nav-btn" data-page="evidence" onclick="navigateTo('evidence')">الأدلة المرئية</button>
+      </nav>
 
-            // ==================== DOM ELEMENTS ====================
-            const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const titleContainer = document.getElementById('titleContainer');
-            const flagSymbol = document.getElementById('flagSymbol');
+      <!-- Coffee Button -->
+      <div class="coffee-button" onclick="openBTCModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg>
+        <span>Donate</span>
+      </div>
 
-            // ==================== CONFIGURATION ====================
-            const CONFIG = {
-                particleCount: 1000,
-                noiseScale: 0.005,
-                mouseRadius: 150,
-                fadeSpeed: 0.05,
-                loadingDuration: 2000,
-                palette: [
-                    { r: 0, g: 122, b: 61 },    // Green
-                    { r: 255, g: 255, b: 255 }, // White
-                    { r: 30, g: 30, b: 35 },    // Near-black
-                    { r: 206, g: 17, b: 38 }    // Red
-                ]
-            };
+      <!-- News Ticker -->
+      <div class="ticker-wrap">
+        <div class="ticker">
+          <span class="ticker-item" style="color: var(--matrix-green);">SYSTEM ONLINE</span>
+          <span class="ticker-item" style="color: var(--accent-red);">RESISTANCE CONTINUES</span>
+          <span class="ticker-item" style="color: var(--accent-gold);">FROM THE RIVER TO THE SEA</span>
+          <span class="ticker-item" style="color: var(--matrix-green);">PALESTINE WILL BE FREE</span>
+          <span class="ticker-item" style="color: white;">FREE PALESTINE</span>
+        </div>
+      </div>
 
-            // ==================== STATE ====================
-            let width = 0;
-            let height = 0;
-            let particles = [];
-            let time = 0;
-            let animationId = null;
+      <!-- Flag Stripe Bottom -->
+      <div class="flag-stripe"></div>
 
-            const mouse = {
-                x: null,
-                y: null,
-                radius: CONFIG.mouseRadius
-            };
+      <!-- Main Container -->
+      <div class="min-h-screen px-4 py-8 md:px-8 lg:px-16">
 
-            // ==================== SIMPLEX NOISE ====================
-            class SimplifiedNoise {
-                constructor() {
-                    this.p = new Array(512);
-                    const perm = new Array(256);
-                    for (let i = 0; i < 256; i++) {
-                        perm[i] = Math.floor(Math.random() * 256);
-                    }
-                    for (let i = 0; i < 512; i++) {
-                        this.p[i] = perm[i & 255];
-                    }
-                }
+        <!-- PAGE: HOME -->
+        <div id="page-home" class="page-view active">
+          <header class="max-w-7xl mx-auto mb-16 fade-in h-[70vh] flex flex-col items-center justify-center">
+            <div class="hero-badge inline-flex items-center gap-3 px-8 py-3 border border-[var(--matrix-green)] rounded-full text-[var(--matrix-green)] text-xs mb-12 bg-[rgba(0,255,65,0.05)] backdrop-blur-sm">
+              <span class="tracking-widest font-bold">SYSTEM INITIALIZED</span>
+            </div>
+            <div class="glitch-wrapper mb-8">
+              <h1 class="glitch-text" data-text="وثيقة التطبيع">وثيقة التطبيع</h1>
+            </div>
+            <p class="text-lg md:text-xl text-[var(--muted)] max-w-3xl mb-10 leading-relaxed text-center">
+              وثيقة تفاعلية متجددة توثق مواقف الدول العربية
+              <br>
+              <span class="text-white font-bold">من القضية الفلسطينية والكيان الصهيوني</span>
+            </p>
+            <div class="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[rgba(20,153,84,0.2)] via-[rgba(228,49,43,0.2)] to-[rgba(20,153,84,0.2)] rounded-full border border-[var(--matrix-green)]">
+              <span class="font-black text-white tracking-wider">FREE PALESTINE</span>
+            </div>
+          </header>
+        </div>
 
-                fade(t) {
-                    return t * t * t * (t * (t * 6 - 15) + 10);
-                }
+        <!-- PAGE: COUNTRIES HISTORY -->
+        <div id="page-countries" class="page-view">
+          <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12 section-header fade-in">
+              <h2 class="text-4xl md:text-5xl font-black text-[var(--matrix-green)]">تاريخ الدول العربية</h2>
+              <p class="text-[var(--muted)] text-sm mt-4">Archives of Arab Nations</p>
+            </div>
+            <main id="countries-container" class="space-y-16">
+              <div class="text-center text-[var(--muted)] py-20">
+                <div class="inline-flex items-center gap-3">
+                  <div class="w-3 h-3 border-2 border-[var(--matrix-green)] border-t-transparent rounded-full animate-spin"></div>
+                  <span>جاري تحميل البيانات...</span>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
 
-                lerp(t, a, b) {
-                    return a + t * (b - a);
-                }
+        <!-- PAGE: PALESTINE -->
+        <div id="page-palestine" class="page-view">
+          <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12 section-header fade-in">
+              <h2 class="text-4xl md:text-5xl font-black text-[var(--accent-gold)]">فلسطين</h2>
+              <p class="text-[var(--muted)] text-sm mt-4">The Land • The People • The Resistance</p>
+            </div>
+            <div class="palestine-section fade-in">
+              <div id="palestine-grid" class="grid grid-cols-1 gap-6"></div>
+            </div>
+          </div>
+        </div>
 
-                grad(hash, x, y, z) {
-                    const h = hash & 15;
-                    const u = h < 8 ? x : y;
-                    const v = h < 4 ? y : h === 12 || h === 14 ? x : z;
-                    return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
-                }
+        <!-- PAGE: SOVEREIGNTY -->
+        <div id="page-sovereignty" class="page-view">
+          <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12 section-header fade-in">
+              <h2 class="text-4xl md:text-5xl font-black text-[var(--accent-purple)]">السيادة المخطوفة</h2>
+              <p class="text-[var(--muted)] text-sm mt-4">When Independence is Traded for Survival</p>
+            </div>
+            <div class="sovereignty-section fade-in">
+              <div id="sovereignty-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            </div>
+          </div>
+        </div>
 
-                noise(x, y, z) {
-                    const X = Math.floor(x) & 255;
-                    const Y = Math.floor(y) & 255;
-                    const Z = Math.floor(z) & 255;
+        <!-- PAGE: EXTERNAL -->
+        <div id="page-external" class="page-view">
+          <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12 section-header fade-in">
+              <h2 class="text-4xl md:text-5xl font-black text-gray-300">الأكاذيب المسيطرة</h2>
+              <p class="text-[var(--muted)] text-sm mt-4">أدوات تحكم خفية تتحكم بمصيرنا</p>
+            </div>
+            <div class="external-section fade-in">
+              <div id="external-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+          </div>
+        </div>
 
-                    x -= Math.floor(x);
-                    y -= Math.floor(y);
-                    z -= Math.floor(z);
+        <!-- PAGE: EVIDENCE -->
+        <div id="page-evidence" class="page-view">
+          <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12 section-header fade-in">
+              <h2 class="text-4xl md:text-5xl font-black text-[var(--accent-blue)]">وثائق الأدلة المرئية</h2>
+              <p class="text-[var(--muted)] text-sm mt-4 max-w-2xl mx-auto">قاعدة بيانات شاملة</p>
+            </div>
+            <div class="evidence-section fade-in">
+               <p class="text-center text-gray-500">قيد الإنشاء...</p>
+            </div>
+          </div>
+        </div>
 
-                    const u = this.fade(x);
-                    const v = this.fade(y);
-                    const w = this.fade(z);
+      </div>
+  </div>
 
-                    const A = this.p[X] + Y;
-                    const AA = this.p[A] + Z;
-                    const AB = this.p[A + 1] + Z;
-                    const B = this.p[X + 1] + Y;
-                    const BA = this.p[B] + Z;
-                    const BB = this.p[B + 1] + Z;
+  <!-- Detail Modal -->
+  <div id="detail-modal" class="modal-overlay" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div id="modal-body" class="relative p-8 md:p-12"></div>
+    </div>
+  </div>
 
-                    return this.lerp(
-                        w,
-                        this.lerp(
-                            v,
-                            this.lerp(
-                                u,
-                                this.grad(this.p[AA], x, y, z),
-                                this.grad(this.p[BA], x - 1, y, z)
-                            ),
-                            this.lerp(
-                                u,
-                                this.grad(this.p[AB], x, y - 1, z),
-                                this.grad(this.p[BB], x - 1, y - 1, z)
-                            )
-                        ),
-                        this.lerp(
-                            v,
-                            this.lerp(
-                                u,
-                                this.grad(this.p[AA + 1], x, y, z - 1),
-                                this.grad(this.p[BA + 1], x - 1, y, z - 1)
-                            ),
-                            this.lerp(
-                                u,
-                                this.grad(this.p[AB + 1], x, y - 1, z - 1),
-                                this.grad(this.p[BB + 1], x - 1, y - 1, z - 1)
-                            )
-                        )
-                    );
-                }
-            }
+  <!-- BTC Modal -->
+  <div id="btcModal" class="btc-modal-overlay" onclick="closeBTCModalOnBackdrop(event)">
+    <div class="btc-modal-content" onclick="event.stopPropagation()">
+      <button class="close-btc-modal" onclick="closeBTCModal()">×</button>
+      <h2 class="text-2xl font-black mb-2 text-[var(--accent-gold)]">Support the Project</h2>
+      <p class="text-gray-400 mb-6 text-sm">Bitcoin address</p>
+      <div class="btc-address-box bg-black border border-gray-700 p-4 rounded-lg text-yellow-500 text-xs break-all mb-4">
+        bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4
+      </div>
+      <button class="copy-btn bg-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:bg-yellow-500 transition" onclick="copyBTC()">Copy Address</button>
+    </div>
+  </div>
 
-            const noise = new SimplifiedNoise();
-
-            // ==================== PARTICLE CLASS ====================
-            class Particle {
-                constructor() {
-                    this.x = 0;
-                    this.y = 0;
-                    this.vx = 0;
-                    this.vy = 0;
-                    this.speed = 0;
-                    this.size = 0;
-                    this.color = null;
-                    this.reset();
-                }
-
-                reset() {
-                    this.x = Math.random() * width;
-                    this.y = Math.random() * height;
-                    this.vx = 0;
-                    this.vy = 0;
-                    this.speed = Math.random() * 1.5 + 0.5;
-                    this.size = Math.max(0.5, Math.random() * 1.5 + 0.5);
-                    this.color = CONFIG.palette[Math.floor(Math.random() * CONFIG.palette.length)];
-                }
-
-                update() {
-                    // Flow field force
-                    const angle = noise.noise(
-                        this.x * CONFIG.noiseScale,
-                        this.y * CONFIG.noiseScale,
-                        time * 0.0003
-                    ) * Math.PI * 4;
-
-                    let fx = Math.cos(angle) * this.speed;
-                    let fy = Math.sin(angle) * this.speed;
-
-                    // Mouse interaction
-                    if (mouse.x !== null && mouse.y !== null) {
-                        const dx = mouse.x - this.x;
-                        const dy = mouse.y - this.y;
-                        const distSq = dx * dx + dy * dy;
-                        const dist = Math.sqrt(distSq);
-
-                        if (dist < mouse.radius && dist > 0) {
-                            const force = (mouse.radius - dist) / mouse.radius;
-                            const pushAngle = Math.atan2(dy, dx) + Math.PI / 2;
-                            fx += Math.cos(pushAngle) * force * 3;
-                            fy += Math.sin(pushAngle) * force * 3;
-                        }
-                    }
-
-                    this.vx += (fx - this.vx) * 0.1;
-                    this.vy += (fy - this.vy) * 0.1;
-
-                    this.x += this.vx;
-                    this.y += this.vy;
-
-                    // Boundary check
-                    if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
-                        this.reset();
-                    }
-                }
-
-                draw() {
-                    const { r, g, b } = this.color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
-                    ctx.fill();
-                }
-            }
-
-            // ==================== INITIALIZATION ====================
-            function initParticles() {
-                particles = [];
-                for (let i = 0; i < CONFIG.particleCount; i++) {
-                    particles.push(new Particle());
-                }
-            }
-
-            function resize() {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width;
-                canvas.height = height;
-                initParticles();
-            }
-
-            // ==================== ANIMATION ====================
-            function animate() {
-                // Ghosting effect
-                ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
-                ctx.fillRect(0, 0, width, height);
-
-                // Light blending
-                ctx.globalCompositeOperation = 'lighter';
-
-                for (let i = 0; i < particles.length; i++) {
-                    particles[i].update();
-                    particles[i].draw();
-                }
-
-                ctx.globalCompositeOperation = 'source-over';
-
-                time++;
-                animationId = requestAnimationFrame(animate);
-            }
-
-            // ==================== EVENT HANDLERS ====================
-            function handleMouseMove(e) {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-            }
-
-            function handleMouseLeave() {
-                mouse.x = null;
-                mouse.y = null;
-            }
-
-            function handleFlagClick() {
-                location.reload();
-            }
-
-            // ==================== LOADING SEQUENCE ====================
-            function startLoadingSequence() {
-                setTimeout(function() {
-                    // Hide loading overlay
-                    loadingOverlay.classList.add('hidden');
-
-                    // Show title after small delay
-                    setTimeout(function() {
-                        titleContainer.classList.add('visible');
-                    }, 200);
-
-                    // Show flag symbol
-                    setTimeout(function() {
-                        flagSymbol.classList.add('visible');
-                    }, 600);
-
-                }, CONFIG.loadingDuration);
-            }
-
-            // ==================== SETUP ====================
-            function init() {
-                // Set up canvas
-                resize();
-
-                // Event listeners
-                window.addEventListener('resize', resize);
-                window.addEventListener('mousemove', handleMouseMove);
-                window.addEventListener('mouseleave', handleMouseLeave);
-                flagSymbol.addEventListener('click', handleFlagClick);
-
-                // Keyboard accessibility for flag button
-                flagSymbol.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleFlagClick();
-                    }
-                });
-
-                // Start animation
-                animate();
-
-                // Start loading sequence
-                startLoadingSequence();
-            }
-
-            // Wait for DOM
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
-            }
-        })();
-    </script>
+  <!-- Data & Logic Scripts -->
+  <script src="data.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
