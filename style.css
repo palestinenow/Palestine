@@ -245,7 +245,7 @@ body, html {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    display: flex;
+    display: none; /* Hidden by default */
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.2);
@@ -266,19 +266,6 @@ body, html {
 }
 .brain-logo { font-size: 2.5rem; color: #2c5f2d; text-align: center; margin-bottom: 10px; }
 .brain-subtitle { text-align: center; color: #5a7c5a; margin-bottom: 30px; font-size: 1rem; }
-.brain-input-group { display: flex; gap: 10px; }
-.brain-input-group input {
-    flex: 1; padding: 15px 20px; border: none; border-radius: 15px;
-    background: rgba(255, 255, 255, 0.9); border: 1px solid #c0d6c0;
-    font-size: 1rem; transition: all 0.3s; color: #000;
-}
-.brain-input-group input:focus { outline: none; border-color: #2c5f2d; box-shadow: 0 0 0 4px rgba(44, 95, 45, 0.1); }
-.brain-input-group button {
-    padding: 15px 25px; border: none; border-radius: 15px;
-    background: #2c5f2d; color: white; font-size: 1rem; cursor: pointer;
-    transition: all 0.3s;
-}
-.brain-input-group button:hover { background: #1e451f; transform: translateY(-2px); }
 
 /* Brain Dashboard */
 .brain-dashboard { display: flex; height: 100vh; position: relative; }
@@ -292,7 +279,7 @@ body, html {
 .brain-panel-content { padding: 30px 15px; height: 100%; display: flex; flex-direction: column; }
 .brain-panel-logo { font-size: 2rem; text-align: center; margin-bottom: 40px; color: #2c5f2d; animation: gentleFloat 3s infinite; }
 .brain-panel-nav { display: flex; flex-direction: column; gap: 10px; }
-/* Renamed .nav-btn to .brain-action-btn to avoid conflict */
+
 .brain-action-btn {
     background: rgba(255, 255, 255, 0.6); border: none; border-radius: 12px; padding: 12px;
     color: #2c5f2d; cursor: pointer; transition: all 0.3s;
