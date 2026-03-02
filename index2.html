@@ -3,454 +3,421 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | Revolution</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- CSS STYLES --- */
+        /* CSS VARIABLES */
         :root {
-            --bg: #050505;
-            --card: #111;
-            --border: #333;
-            --accent: #007a3d;
-            --text: #e0e0e0;
-            --muted: #888;
+            --bg: #0d1117;
+            --card: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --muted: #8b949e;
+            --accent: #238636;
+            --red: #f85149;
+            --blue: #58a6ff;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg); color: var(--text);
-            min-height: 100vh; display: none; /* Hidden until login */
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            /* FIX: Body is visible by default */
+            display: flex;
+            flex-direction: column;
         }
-        body.logged-in { display: flex; }
 
-        /* Login Screen */
-        #login-screen {
-            position: fixed; inset: 0;
-            background: #000;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000;
+        /* LOGIN SCREEN */
+        #login-layer {
+            position: fixed; 
+            inset: 0; 
+            z-index: 9999;
+            background: #010409;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            /* FIX: Visible by default */
         }
-        #login-box {
-            background: var(--card); padding: 3rem;
+        .login-box {
+            background: var(--card); padding: 40px;
             border: 1px solid var(--border);
-            border-radius: 10px; text-align: center;
+            border-radius: 12px; text-align: center;
             width: 100%; max-width: 400px;
         }
-        #login-box h2 { margin-bottom: 1.5rem; color: var(--accent); }
-        input[type="password"], input[type="text"], select, textarea {
-            width: 100%; padding: 12px;
-            background: #222; border: 1px solid #444;
-            color: #fff; border-radius: 5px;
-            font-size: 1rem; outline: none;
-            font-family: 'Inter', sans-serif;
-        }
-        textarea { resize: vertical; min-height: 100px; }
-        select { cursor: pointer; }
-        button {
-            padding: 10px 20px; background: var(--accent);
-            color: #fff; border: none; border-radius: 5px;
-            cursor: pointer; font-weight: 600; transition: opacity 0.3s;
-            margin-top: 1rem; width: 100%;
-            font-family: 'Inter', sans-serif;
-        }
-        button:hover { opacity: 0.9; }
-        button:disabled { background: #555; cursor: not-allowed; }
-        .error-msg { color: #ff4444; margin-top: 1rem; font-size: 0.9rem; display: none; }
+        .login-box h2 { color: var(--accent); margin-bottom: 20px; font-size: 1.5rem; }
+        input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border); background: #0d1117; color: #fff; font-size: 1rem; outline: none; margin-bottom: 15px; }
+        button { width: 100%; padding: 12px; border-radius: 6px; border: none; background: var(--accent); color: #fff; font-weight: 600; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+        button:hover { filter: brightness(1.1); }
+        .err { color: var(--red); font-size: 0.85rem; margin-top: 10px; display: none; }
 
-        /* Admin Layout */
-        .admin-container { display: flex; width: 100%; min-height: 100vh; }
-        
-        /* Sidebar */
-        .sidebar {
-            width: 250px; background: #111;
+        /* MAIN APP CONTAINER */
+        /* FIX: Hidden by default until login */
+        #main-app-wrapper {
+            display: none; 
+            height: 100%;
+            flex-direction: column;
+        }
+        body.logged-in #login-layer { display: none; }
+        body.logged-in #main-app-wrapper { display: flex; }
+
+        /* TOP BAR */
+        .top-bar {
+            height: 60px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; background: #161b22; flex-shrink: 0;
+        }
+        .top-bar h1 { font-size: 1rem; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .top-bar .status { font-size: 0.8rem; background: #30363d; padding: 4px 8px; border-radius: 4px; color: #fff; }
+        .actions { display: flex; gap: 10px; }
+        .btn-sm { padding: 8px 16px; font-size: 0.85rem; width: auto; border-radius: 6px; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); }
+        .btn-danger { background: var(--red); }
+        .btn-download { background: #1f6feb; border: none; color: #fff; }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            flex: 1; display: flex; overflow: hidden; height: calc(100vh - 60px);
+        }
+
+        /* LEFT PANEL (LIST) */
+        .left-panel {
+            width: 350px; background: #0d1117;
             border-right: 1px solid var(--border);
-            padding: 2rem 1rem;
-            display: flex; flex-direction: column; gap: 1rem;
-            flex-shrink: 0;
+            display: flex; flex-direction: column;
         }
-        .sidebar h3 { color: var(--accent); font-size: 1.2rem; margin-bottom: 1rem; padding: 0 0.5rem; }
-        .sidebar-btn {
-            background: transparent; color: var(--muted);
-            text-align: left; padding: 12px; border-radius: 5px;
-            width: 100%; margin: 0; border: none;
-        }
-        .sidebar-btn:hover, .sidebar-btn.active { background: #222; color: #fff; }
-        .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
+        .list-header { padding: 15px; border-bottom: 1px solid var(--border); }
+        .tabs { display: flex; gap: 5px; margin-top: 10px; }
+        .tab { padding: 6px 12px; font-size: 0.8rem; border-radius: 20px; cursor: pointer; background: transparent; color: var(--muted); border: 1px solid transparent; width: auto; }
+        .tab.active { background: var(--card); color: #fff; border-color: var(--border); }
 
-        /* Main Content */
-        .main-content { flex: 1; padding: 2rem; overflow-y: auto; background: #080808; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
-        .header h1 { font-size: 1.5rem; }
-        .btn-group { display: flex; gap: 0.5rem; }
-        .btn-secondary { background: #333; width: auto; padding: 10px 20px; }
-        .btn-primary { background: var(--accent); width: auto; }
+        .list-items { flex: 1; overflow-y: auto; padding: 10px; }
+        .item-row {
+            padding: 12px 15px; margin-bottom: 5px;
+            background: var(--card); border-radius: 6px;
+            cursor: pointer; transition: 0.2s; border: 1px solid transparent;
+        }
+        .item-row:hover { border-color: #30363d; }
+        .item-row.active { border-color: var(--blue); background: #0d1117; }
+        .item-row .id { font-size: 0.75rem; color: var(--muted); font-family: monospace; }
+        .item-row .name { font-weight: 600; font-size: 0.95rem; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* RIGHT PANEL (EDITOR) */
+        .right-panel {
+            flex: 1; background: var(--bg);
+            display: flex; flex-direction: column;
+            overflow-y: auto; position: relative;
+        }
+        .editor-form { padding: 30px; max-width: 800px; width: 100%; margin: 0 auto; }
         
-        /* Table */
-        .table-container { overflow-x: auto; background: var(--card); border-radius: 8px; border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background: #1a1a1a; color: var(--muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
-        tr:hover { background: rgba(255,255,255,0.03); }
-        .action-btn { 
-            background: transparent; color: var(--accent); width: auto;
-            padding: 5px 10px; font-size: 0.8rem; border: 1px solid var(--accent);
-            border-radius: 4px; margin: 0;
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; background: #0d1117; border: 1px solid var(--border);
+            color: #fff; padding: 10px; border-radius: 6px; font-family: 'Inter';
         }
-        .action-btn.delete { border-color: #ff4444; color: #ff4444; margin-left: 5px; }
-        .action-btn:hover { background: rgba(0, 122, 61, 0.1); }
-        .action-btn.delete:hover { background: rgba(255, 68, 68, 0.1); }
-
-        /* Modal Editor */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-            display: none; align-items: center; justify-content: center; z-index: 500;
-            padding: 1rem;
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--blue); outline: none;
         }
-        .modal-overlay.show { display: flex; }
-        .modal-content {
-            background: #0a0a0a; padding: 2rem;
-            border-radius: 10px; width: 100%; max-width: 600px;
-            max-height: 90vh; overflow-y: auto;
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .form-group textarea { min-height: 150px; resize: vertical; line-height: 1.6; }
+        
+        .btn-save { position: sticky; bottom: 0; left: 0; width: 100%; padding: 15px; border-radius: 0; font-size: 1rem; margin-top: 20px; }
 
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-        .modal-header h2 { font-size: 1.2rem; color: #fff; }
-        .close-btn { background: transparent; color: #fff; width: 30px; height: 30px; padding: 0; border: 1px solid #444; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
-
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; color: #aaa; font-size: 0.9rem; font-weight: 600; }
+        /* EMPTY STATE */
+        .empty-state { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted); text-align: center; flex-direction: column; gap: 10px; }
         
         /* Responsive */
         @media (max-width: 768px) {
-            .admin-container { flex-direction: column; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 1rem; overflow-x: auto; flex-direction: row; }
-            .sidebar h3 { display: none; }
-            .sidebar-btn { white-space: nowrap; }
-            .sidebar-footer { border-top: none; padding-top: 0; margin-top: 0; }
+            .main-container { flex-direction: column; }
+            .left-panel { width: 100%; height: 40%; border-right: none; border-bottom: 1px solid var(--border); }
+            .right-panel { height: 60%; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Login Screen -->
-    <div id="login-screen">
-        <div id="login-box">
-            <h2>🔐 Admin Access</h2>
-            <input type="password" id="password-input" placeholder="Enter Password" autofocus>
-            <button onclick="attemptLogin()">Unlock</button>
-            <div class="error-msg" id="error-msg">Incorrect Password</div>
+    <!-- LOGIN LAYER (Visible First) -->
+    <div id="login-layer">
+        <div class="login-box">
+            <h2>Admin Access</h2>
+            <input type="password" id="pass" placeholder="Enter Password">
+            <button onclick="login()">Enter</button>
+            <div class="err" id="err">Incorrect Password</div>
         </div>
     </div>
 
-    <!-- Admin Interface -->
-    <div class="admin-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div>
-                <h3>Dashboard</h3>
-                <button class="sidebar-btn active" onclick="loadData('main')">Main Data (Site)</button>
-                <button class="sidebar-btn" onclick="loadData('brain')">Brain Data (Light)</button>
+    <!-- MAIN APP WRAPPER (Hidden Until Login) -->
+    <div id="main-app-wrapper">
+        
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <h1>
+                <span id="page-title">Manage Data</span>
+                <span class="status" id="mode-status">Main Site</span>
+            </h1>
+            <div class="actions">
+                <button class="btn-sm btn-download" onclick="downloadData()">⬇ Download Updated File</button>
+                <button class="btn-sm btn-danger" onclick="logout()">Logout</button>
             </div>
-            <div class="sidebar-footer">
-                <button class="sidebar-btn" style="color: #ff4444;" onclick="logout()">Logout</button>
-            </div>
-        </aside>
+        </div>
 
-        <!-- Main Area -->
-        <main class="main-content">
-            <div class="header">
-                <h1 id="page-title">Manage Main Data</h1>
-                <div class="btn-group">
-                    <button class="btn-secondary" onclick="downloadCurrentData()">⬇ Download Updated File</button>
-                    <button class="btn-primary" onclick="openModal('new')">+ Add New Item</button>
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left: List -->
+            <div class="left-panel">
+                <div class="list-header">
+                    <button class="btn-sm" onclick="newItem()" style="width:100%;">+ Add New Item</button>
+                    <div class="tabs">
+                        <div class="tab active" id="tab-main" onclick="switchData('main')">Main Site</div>
+                        <div class="tab" id="tab-brain" onclick="switchData('brain')">Brain App</div>
+                    </div>
+                </div>
+                <div class="list-items" id="list-container">
+                    <!-- Items injected here -->
                 </div>
             </div>
-            
-            <div class="table-container">
-                <div id="data-table-container">
-                    <!-- Table injected here -->
+
+            <!-- Right: Editor -->
+            <div class="right-panel">
+                <div class="empty-state" id="empty-state">
+                    Select an item to edit or create new one
+                </div>
+                <div class="editor-form" id="editor" style="display:none;">
+                    
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>ID (Unique Number)</label>
+                            <input type="number" id="form-id">
+                        </div>
+                        <div class="form-group" id="box-level" style="flex:1;">
+                            <label>Level (0-5)</label>
+                            <select id="form-level">
+                                <option value="0">0 (Special)</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="box-cat" style="flex:1; display:none;">
+                            <label>Category</label>
+                            <select id="form-cat"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label id="label-name">Name / Question</label>
+                        <input type="text" id="form-name">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subtitle</label>
+                        <input type="text" id="form-sub">
+                    </div>
+
+                    <div class="form-group">
+                        <label id="label-content">Content (Events / Answer)</label>
+                        <textarea id="form-content"></textarea>
+                    </div>
+
+                    <div class="form-group" id="box-ref" style="display:none;">
+                        <label>Reference</label>
+                        <input type="text" id="form-ref">
+                    </div>
+                    
+                    <button class="btn-save" onclick="saveChanges()">Save Changes</button>
+                    <br><br>
+                    <button class="btn-sm btn-danger" onclick="deleteCurrentItem()" style="width:100%; opacity:0.7;">Delete This Item</button>
                 </div>
             </div>
-        </main>
-    </div>
-
-    <!-- Edit Modal -->
-    <div class="modal-overlay" id="edit-modal" onclick="if(event.target === this) closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h2 id="modal-title">Edit Item</h2>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
-            </div>
-            
-            <div class="form-group">
-                <label>ID (Unique Number)</label>
-                <input type="number" id="form-id" placeholder="e.g. 500">
-            </div>
-            
-            <div class="form-group">
-                <label>Name / Title</label>
-                <input type="text" id="form-name" placeholder="e.g. فلسطين">
-            </div>
-
-            <div class="form-group" id="field-level">
-                <label>Level (1-5 for Countries, 0 for Special)</label>
-                <input type="number" id="form-level" placeholder="0">
-            </div>
-
-            <div class="form-group" id="field-category" style="display:none;">
-                <label>Category</label>
-                <select id="form-category">
-                    <!-- Options injected via JS -->
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Subtitle</label>
-                <input type="text" id="form-subtitle" placeholder="Short description">
-            </div>
-
-            <div class="form-group">
-                <label>Content (Events / Answer)</label>
-                <textarea id="form-events" rows="6" placeholder="Main content goes here..."></textarea>
-            </div>
-
-            <div class="form-group" id="field-ref">
-                <label>Reference</label>
-                <input type="text" id="form-ref" placeholder="e.g. Surah Al-Baqarah">
-            </div>
-
-            <button onclick="saveItem()">Save Changes</button>
         </div>
     </div>
 
-    <!-- External Data Scripts -->
+    <!-- Connect to Data -->
     <script src="data.js"></script>
     <script src="data2.js"></script>
 
     <script>
-        // ===== STATE =====
-        let currentMode = 'main'; // 'main' or 'brain'
-        let editingIndex = -1; // -1 for new
-        const CORRECT_PASS = "theone123";
+        const PASS = "theone123";
+        let mode = 'main';
+        let currentData = [];
+        let currentIdx = -1;
 
         // ===== AUTH =====
-        function attemptLogin() {
-            const input = document.getElementById('password-input').value;
-            if (input === CORRECT_PASS) {
+        function login() {
+            if (document.getElementById('pass').value === PASS) {
                 document.body.classList.add('logged-in');
-                document.getElementById('login-screen').style.display = 'none';
-                localStorage.setItem('admin_logged_in', 'true');
-                loadData('main');
-            } else {
-                document.getElementById('error-msg').style.display = 'block';
-                document.getElementById('password-input').value = '';
-            }
-        }
-
-        function logout() {
-            document.body.classList.remove('logged-in');
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('error-msg').style.display = 'none';
-            localStorage.removeItem('admin_logged_in');
-        }
-
-        // Check session on load
-        if (localStorage.getItem('admin_logged_in') === 'true') {
-            document.body.classList.add('logged-in');
-            document.getElementById('login-screen').style.display = 'none';
-            loadData('main');
+                localStorage.setItem('auth', '1');
+                init();
+            } else document.getElementById('err').style.display = 'block';
         }
         
-        // Enter key login
-        document.getElementById("password-input").addEventListener("keyup", function(event) {
-            if (event.key === "Enter") attemptLogin();
+        function logout() {
+            localStorage.removeItem('auth');
+            location.reload();
+        }
+
+        // Auto-login check
+        if (localStorage.getItem('auth') === '1') {
+            document.body.classList.add('logged-in');
+            init();
+        }
+
+        // Enter key listener
+        document.getElementById("pass").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") login();
         });
 
-        // ===== DATA MANAGEMENT =====
-        function loadData(type) {
-            currentMode = type;
-            
-            // Update UI active state
-            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-            // The event target might be window if called programmatically, so we find the button
-            const activeBtn = Array.from(document.querySelectorAll('.sidebar-btn')).find(b => b.textContent.toLowerCase().includes(type));
-            if(activeBtn) activeBtn.classList.add('active');
-
-            document.getElementById('page-title').innerText = type === 'main' ? 'Manage Main Data (Site)' : 'Manage Brain Data (Light)';
-            
-            // Toggle fields visibility
-            document.getElementById('field-level').style.display = type === 'main' ? 'block' : 'none';
-            document.getElementById('field-category').style.display = type === 'brain' ? 'block' : 'none';
-            document.getElementById('field-ref').style.display = type === 'brain' ? 'block' : 'none';
-
-            // Populate Category Select for Brain
-            if (type === 'brain') {
-                const sel = document.getElementById('form-category');
+        // ===== INIT =====
+        function init() {
+            // Populate categories for Brain mode
+            const sel = document.getElementById('form-cat');
+            if (typeof brainCategories !== 'undefined') {
                 sel.innerHTML = brainCategories.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('');
             }
-
-            renderTable();
+            switchData('main');
         }
 
-        function renderTable() {
-            const container = document.getElementById('data-table-container');
-            const data = currentMode === 'main' ? countriesData : brainData;
+        function switchData(m) {
+            mode = m;
+            currentIdx = -1;
             
-            let html = `<table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>${currentMode === 'main' ? 'Name' : 'Question'}</th>
-                        <th>${currentMode === 'main' ? 'Level' : 'Category'}</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+            // UI Updates
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + m).classList.add('active');
+            document.getElementById('mode-status').innerText = m === 'main' ? 'Main Site' : 'Brain App';
+            
+            // Show/Hide specific fields
+            document.getElementById('box-level').style.display = m === 'main' ? 'block' : 'none';
+            document.getElementById('box-cat').style.display = m === 'brain' ? 'block' : 'none';
+            document.getElementById('box-ref').style.display = m === 'brain' ? 'block' : 'none';
 
-            data.forEach((item, index) => {
-                html += `
-                    <tr>
-                        <td style="font-family: monospace; color: #888;">#${item.id}</td>
-                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            ${item.name || item.question}
-                        </td>
-                        <td>
-                            <span style="background: #222; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">
-                                ${item.level !== undefined ? item.level : item.category}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="action-btn" onclick="openModal(${index})">Edit</button>
-                            <button class="action-btn delete" onclick="deleteItem(${index})">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
+            // Change Labels
+            document.getElementById('label-name').innerText = m === 'main' ? 'Name' : 'Question';
+            document.getElementById('label-content').innerText = m === 'main' ? 'Events (Content)' : 'Answer';
 
-            html += `</tbody></table>`;
-            container.innerHTML = html;
+            renderList();
+            closeEditor();
         }
 
-        // ===== MODAL LOGIC =====
-        function openModal(index) {
-            editingIndex = index;
-            const modal = document.getElementById('edit-modal');
-            const data = currentMode === 'main' ? countriesData : brainData;
+        // ===== LIST =====
+        function renderList() {
+            const list = document.getElementById('list-container');
+            currentData = mode === 'main' ? countriesData : brainData;
             
-            // Clear form if new
-            if (index === 'new') {
-                document.getElementById('modal-title').innerText = "Add New Item";
-                document.getElementById('form-id').value = '';
-                document.getElementById('form-name').value = '';
-                document.getElementById('form-level').value = '0';
-                document.getElementById('form-subtitle').value = '';
-                document.getElementById('form-events').value = '';
-                document.getElementById('form-ref').value = '';
-                if(currentMode === 'brain') document.getElementById('form-category').value = brainCategories[0].id;
-            } else {
-                // Fill form if editing
-                const item = data[index];
-                document.getElementById('modal-title').innerText = "Edit Item";
-                document.getElementById('form-id').value = item.id;
-                document.getElementById('form-name').value = item.name || item.question;
-                document.getElementById('form-level').value = item.level || 0;
-                document.getElementById('form-subtitle').value = item.subtitle || '';
-                document.getElementById('form-events').value = item.events || item.answer || '';
-                document.getElementById('form-ref').value = item.reference || '';
-                if(item.category) document.getElementById('form-category').value = item.category;
-            }
-            
-            modal.classList.add('show');
+            list.innerHTML = currentData.map((item, i) => `
+                <div class="item-row ${i === currentIdx ? 'active' : ''}" onclick="loadItem(${i})">
+                    <div class="id">ID: ${item.id}</div>
+                    <div class="name">${item.name || item.question}</div>
+                </div>
+            `).join('');
         }
 
-        function closeModal() {
-            document.getElementById('edit-modal').classList.remove('show');
+        // ===== EDITOR =====
+        function newItem() {
+            currentIdx = -1;
+            loadItem(-1);
         }
 
-        function saveItem() {
-            const data = currentMode === 'main' ? countriesData : brainData;
+        function loadItem(idx) {
+            currentIdx = idx;
+            renderList();
+
+            const editor = document.getElementById('editor');
+            const empty = document.getElementById('empty-state');
             
-            // Basic Validation
-            const newId = parseInt(document.getElementById('form-id').value);
-            if (!newId) {
-                alert("ID is required and must be a number.");
-                return;
+            editor.style.display = 'block';
+            empty.style.display = 'none';
+
+            const item = idx === -1 ? {} : currentData[idx];
+
+            document.getElementById('form-id').value = item.id || '';
+            document.getElementById('form-name').value = item.name || item.question || '';
+            document.getElementById('form-level').value = item.level || 0;
+            
+            if(mode === 'brain') {
+                document.getElementById('form-cat').value = item.category || (brainCategories[0] ? brainCategories[0].id : 'social');
             }
 
+            document.getElementById('form-sub').value = item.subtitle || '';
+            document.getElementById('form-content').value = item.events || item.answer || '';
+            document.getElementById('form-ref').value = item.reference || '';
+        }
+
+        function closeEditor() {
+            document.getElementById('editor').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'flex';
+        }
+
+        function saveChanges() {
             const newItem = {
-                id: newId,
-                name: document.getElementById('form-name').value,
-                subtitle: document.getElementById('form-subtitle').value,
-                links: []
+                id: parseInt(document.getElementById('form-id').value),
+                subtitle: document.getElementById('form-sub').value,
             };
 
-            if (currentMode === 'main') {
+            if (mode === 'main') {
+                newItem.name = document.getElementById('form-name').value;
                 newItem.level = parseInt(document.getElementById('form-level').value);
-                newItem.events = document.getElementById('form-events').value;
-                // Preserve links if editing
-                if (editingIndex !== 'new' && data[editingIndex].links) {
-                    newItem.links = data[editingIndex].links;
+                newItem.events = document.getElementById('form-content').value;
+                if (currentIdx !== -1 && currentData[currentIdx].links) {
+                    newItem.links = currentData[currentIdx].links;
+                } else {
+                    newItem.links = [];
                 }
             } else {
-                newItem.question = newItem.name; // Map name to question
-                delete newItem.name;
-                newItem.answer = document.getElementById('form-events').value; // Map events to answer
-                delete newItem.events;
+                newItem.question = document.getElementById('form-name').value;
+                newItem.answer = document.getElementById('form-content').value;
                 newItem.reference = document.getElementById('form-ref').value;
-                newItem.category = document.getElementById('form-category').value;
+                newItem.category = document.getElementById('form-cat').value;
             }
 
-            if (editingIndex === 'new') {
-                data.push(newItem);
+            if (!newItem.id) return alert("ID is required.");
+
+            if (currentIdx === -1) {
+                currentData.push(newItem);
+                currentIdx = currentData.length - 1;
+                alert("Added! Click 'Download' to save.");
             } else {
-                data[editingIndex] = newItem;
+                currentData[currentIdx] = newItem;
+                alert("Updated! Click 'Download' to save.");
             }
-
-            closeModal();
-            renderTable();
-            alert("Saved locally! Remember to click 'Download Updated File' to save your changes to your computer.");
+            
+            renderList();
         }
 
-        function deleteItem(index) {
-            if(confirm("Are you sure you want to delete this item?")) {
-                const data = currentMode === 'main' ? countriesData : brainData;
-                data.splice(index, 1);
-                renderTable();
+        function deleteCurrentItem() {
+            if (currentIdx === -1) return;
+            if(confirm("Delete this item?")) {
+                currentData.splice(currentIdx, 1);
+                currentIdx = -1;
+                renderList();
+                closeEditor();
+                alert("Deleted! Click 'Download' to save.");
             }
         }
 
-        // ===== EXPORT / DOWNLOAD =====
-        function downloadCurrentData() {
-            let dataStr, fileName;
-
-            if (currentMode === 'main') {
-                // We need to format it nicely, preserving the `levels` object
-                const levelsStr = JSON.stringify(levels, null, 2);
-                const dataStrRaw = JSON.stringify(countriesData, null, 2);
-                const content = `// data.js\n\nconst levels = ${levelsStr};\n\nconst countriesData = ${dataStrRaw};\n\nconst bigEventsData = [];`;
-                dataStr = content;
-                fileName = 'data.js';
+        // ===== DOWNLOAD =====
+        function downloadData() {
+            let content, filename;
+            
+            if (mode === 'main') {
+                content = `// data.js\n\nconst levels = ${JSON.stringify(levels, null, 2)};\n\nconst countriesData = ${JSON.stringify(countriesData, null, 2)};\n\nconst bigEventsData = [];`;
+                filename = 'data.js';
             } else {
-                const catsStr = JSON.stringify(brainCategories, null, 2);
-                const dataStrRaw = JSON.stringify(brainData, null, 2);
-                const content = `// data2.js\n\nconst brainCategories = ${catsStr};\n\nconst brainData = ${dataStrRaw};`;
-                dataStr = content;
-                fileName = 'data2.js';
+                content = `// data2.js\n\nconst brainCategories = ${JSON.stringify(brainCategories, null, 2)};\n\nconst brainData = ${JSON.stringify(brainData, null, 2)};`;
+                filename = 'data2.js';
             }
 
-            const blob = new Blob([dataStr], { type: "text/javascript" });
-            const url = URL.createObjectURL(blob);
+            const blob = new Blob([content], {type: 'text/javascript'});
             const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
             a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
         }
     </script>
 </body>
