@@ -5,17 +5,9 @@
 
     // ==================== CONFIGURATION ====================
     const CONFIG = {
-        particleCount: 1000,
-        noiseScale: 0.005,
-        mouseRadius: 150,
-        fadeSpeed: 0.05,
-        loadingDuration: 3000, // 3 Seconds transition
-        palette: [
-            { r: 0, g: 122, b: 61 },    // Green
-            { r: 255, g: 255, b: 255 }, // White
-            { r: 30, g: 30, b: 35 },    // Near-black
-            { r: 206, g: 17, b: 38 }    // Red
-        ]
+        loadingDuration: 3000, // 3 Seconds
+        dragonSegments: 80,
+        numbersCount: 30
     };
 
     // ==================== DOM ELEMENTS ====================
@@ -24,116 +16,155 @@
     const loadingOverlay = document.getElementById('loadingOverlay');
     const mainApp = document.getElementById('main-app');
 
-    let width, height, particles = [], time = 0;
-    const mouse = { x: null, y: null, radius: CONFIG.mouseRadius };
+    let width, height;
+    let animationId;
+    const mouse = { x: width/2, y: height/2 };
 
-    // ==================== SIMPLEX NOISE (from Design) ====================
-    class SimplifiedNoise {
+    // ==================== SHADOW DRAGON CLASS ====================
+    class ShadowDragon {
         constructor() {
-            this.p = new Array(512);
-            const perm = new Array(256);
-            for (let i = 0; i < 256; i++) perm[i] = Math.floor(Math.random() * 256);
-            for (let i = 0; i < 512; i++) this.p[i] = perm[i & 255];
-        }
-        fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
-        lerp(t, a, b) { return a + t * (b - a); }
-        grad(hash, x, y, z) {
-            const h = hash & 15;
-            const u = h < 8 ? x : y;
-            const v = h < 4 ? y : h === 12 || h === 14 ? x : z;
-            return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
-        }
-        noise(x, y, z) {
-            const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
-            x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
-            const u = this.fade(x), v = this.fade(y), w = this.fade(z);
-            const A = this.p[X] + Y, AA = this.p[A] + Z, AB = this.p[A + 1] + Z;
-            const B = this.p[X + 1] + Y, BA = this.p[B] + Z, BB = this.p[B + 1] + Z;
-            return this.lerp(w,
-                this.lerp(v,
-                    this.lerp(u, this.grad(this.p[AA], x, y, z), this.grad(this.p[BA], x - 1, y, z)),
-                    this.lerp(u, this.grad(this.p[AB], x, y - 1, z), this.grad(this.p[BB], x - 1, y - 1, z))),
-                this.lerp(v,
-                    this.lerp(u, this.grad(this.p[AA + 1], x, y, z - 1), this.grad(this.p[BA + 1], x - 1, y, z - 1)),
-                    this.lerp(u, this.grad(this.p[AB + 1], x, y - 1, z - 1), this.grad(this.p[BB + 1], x - 1, y - 1, z - 1))));
-        }
-    }
-    const noise = new SimplifiedNoise();
-
-    // ==================== PARTICLE CLASS ====================
-    class Particle {
-        constructor() { this.reset(); }
-        reset() {
-            this.x = Math.random() * width;
-            this.y = Math.random() * height;
-            this.vx = 0; this.vy = 0;
-            this.speed = Math.random() * 1.5 + 0.5;
-            this.size = Math.max(0.5, Math.random() * 1.5 + 0.5);
-            this.color = CONFIG.palette[Math.floor(Math.random() * CONFIG.palette.length)];
-        }
-        update() {
-            const angle = noise.noise(this.x * CONFIG.noiseScale, this.y * CONFIG.noiseScale, time * 0.0003) * Math.PI * 4;
-            let fx = Math.cos(angle) * this.speed;
-            let fy = Math.sin(angle) * this.speed;
-
-            if (mouse.x !== null && mouse.y !== null) {
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < mouse.radius && dist > 0) {
-                    const force = (mouse.radius - dist) / mouse.radius;
-                    const pushAngle = Math.atan2(dy, dx) + Math.PI / 2;
-                    fx += Math.cos(pushAngle) * force * 3;
-                    fy += Math.sin(pushAngle) * force * 3;
-                }
+            this.segments = [];
+            this.numbers = [];
+            
+            // Init Segments
+            for(let i=0; i<CONFIG.dragonSegments; i++) {
+                this.segments.push({
+                    x: width/2, 
+                    y: height/2,
+                    size: Math.max(1, 20 - i * 0.2) // Head is largest
+                });
             }
-            this.vx += (fx - this.vx) * 0.1;
-            this.vy += (fy - this.vy) * 0.1;
-            this.x += this.vx;
-            this.y += this.vy;
-            if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+
+            // Init Floating Numbers
+            for(let i=0; i<CONFIG.numbersCount; i++) {
+                this.numbers.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    val: Math.floor(Math.random() * 80) + 20, // 20-100
+                    speed: Math.random() * 0.5 + 0.1,
+                    opacity: Math.random()
+                });
+            }
         }
+
+        update() {
+            // Move Head towards mouse
+            const head = this.segments[0];
+            const dx = mouse.x - head.x;
+            const dy = mouse.y - head.y;
+            
+            // Easing
+            head.x += dx * 0.05;
+            head.y += dy * 0.05;
+
+            // Move Body (Follow the leader)
+            for (let i = 1; i < this.segments.length; i++) {
+                const prev = this.segments[i-1];
+                const curr = this.segments[i];
+                
+                const angle = Math.atan2(prev.y - curr.y, prev.x - curr.x);
+                const dist = 5; // Tightness of the dragon
+                
+                curr.x = prev.x - Math.cos(angle) * dist;
+                curr.y = prev.y - Math.sin(angle) * dist;
+            }
+
+            // Update Floating Numbers
+            this.numbers.forEach(n => {
+                n.y -= n.speed;
+                n.opacity -= 0.002;
+                
+                // Reset if faded or off screen
+                if (n.opacity <= 0 || n.y < 0) {
+                    n.y = height + 20;
+                    n.x = Math.random() * width;
+                    n.opacity = 0.5 + Math.random() * 0.5;
+                    n.val = Math.floor(Math.random() * 80) + 20;
+                }
+            });
+        }
+
         draw() {
-            const { r, g, b } = this.color;
+            // Draw Dragon Body
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)'; // Solid black shadow
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Start path
+            if (this.segments.length > 0) {
+                ctx.moveTo(this.segments[0].x, this.segments[0].y);
+                
+                // Draw smooth curve through points
+                for (let i = 1; i < this.segments.length - 2; i++) {
+                    const xc = (this.segments[i].x + this.segments[i + 1].x) / 2;
+                    const yc = (this.segments[i].y + this.segments[i + 1].y) / 2;
+                    ctx.quadraticCurveTo(this.segments[i].x, this.segments[i].y, xc, yc);
+                }
+                
+                ctx.stroke();
+            }
+
+            // Draw Head Glow (Scary Eye effect)
+            const head = this.segments[0];
+            ctx.beginPath();
+            ctx.arc(head.x, head.y, 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#b91c1c'; // Red Eye
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "#b91c1c";
             ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Draw Floating Numbers
+            ctx.font = "12px 'Roboto Mono'";
+            this.numbers.forEach(n => {
+                ctx.fillStyle = `rgba(185, 28, 28, ${n.opacity})`; // Red numbers
+                ctx.fillText(n.val, n.x, n.y);
+            });
         }
     }
 
     // ==================== APP LOGIC ====================
     function initAppLogic() {
-        // Check Data
-        if (typeof levels === 'undefined' || typeof countriesData === 'undefined') {
-            console.error("Data not loaded");
-            return;
-        }
+        if (typeof levels === 'undefined') return;
 
-        // Navigation
+        // Navigation Fix
         window.navigateTo = function(pageId) {
-            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            // 1. Hide all views
+            document.querySelectorAll('.page-view').forEach(el => {
+                el.classList.remove('active');
+                // Critical: Force display none to prevent layout thrashing
+                el.style.display = 'none'; 
+            });
+
+            // 2. Deactivate buttons
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            // 3. Show target view
             const target = document.getElementById(`page-${pageId}`);
             if (target) {
-                target.classList.add('active');
-                // Scroll to top or keep scroll? Let's reset scroll for pages
-                window.scrollTo(0, 0); 
+                target.style.display = 'block'; // Force display block first
+                // Small delay to trigger transition
+                setTimeout(() => target.classList.add('active'), 10);
+                
+                // Scroll to top instantly
+                window.scrollTo({ top: 0, behavior: 'instant' });
             }
+
             const btn = document.querySelector(`.nav-btn[data-page="${pageId}"]`);
             if (btn) btn.classList.add('active');
         };
 
-        // Render
         renderApp();
     }
 
     function renderApp() {
         const container = document.getElementById('countries-container');
         if(!container) return;
-        
-        container.innerHTML = ''; // Clear loading
-        
+        container.innerHTML = '';
+
+        // Render Levels
         for (let i = 1; i <= 5; i++) {
             const levelInfo = levels[i];
             const countries = countriesData.filter(c => c.level === i);
@@ -142,16 +173,14 @@
             const section = document.createElement('section');
             section.className = 'level-section fade-in';
             section.innerHTML = `
-                <div class="level-header">
-                    <h3 class="level-title">${levelInfo.title.split(':')[1] || levelInfo.title}</h3>
-                    <span class="level-count">${countries.length} States</span>
-                </div>
+                <div class="level-title">${levelInfo.title}</div>
+                <p style="font-family:'Roboto Mono'; font-size:0.8rem; color:var(--muted); margin-bottom:1rem;">${levelInfo.desc}</p>
                 <div class="grid-container">
                     ${countries.map(c => `
                         <div class="country-card" onclick="openModal(${c.id})">
                             <div class="card-name">${c.name}</div>
-                            <div class="card-sub">${c.subtitle || ''}</div>
-                            <div class="card-action">View File</div>
+                            <div class="card-sub">${c.subtitle || 'Classified'}</div>
+                            <div class="card-action">Access File</div>
                         </div>
                     `).join('')}
                 </div>
@@ -159,7 +188,7 @@
             container.appendChild(section);
         }
 
-        // Special Sections
+        // Special Grids
         renderSpecial('palestine', 'palestine-grid', countriesData.filter(c => c.id === 100));
         renderSpecial('sovereignty', 'sovereignty-grid', countriesData.filter(c => c.id >= 101 && c.id < 200));
         renderSpecial('external', 'external-grid', countriesData.filter(c => c.id >= 200));
@@ -173,7 +202,7 @@
             <div class="country-card" onclick="openModal(${item.id})">
                 <div class="card-name">${item.name}</div>
                 <div class="card-sub">${item.subtitle || ''}</div>
-                <div class="card-action">Explore</div>
+                <div class="card-action">Read More</div>
             </div>
         `).join('');
     }
@@ -185,15 +214,13 @@
         const modal = document.getElementById('detail-modal');
         const body = document.getElementById('modal-body');
         
-        // Format Content
-        let content = item.events ? item.events.replace(/\n/g, '<br>') : '';
-        content = content.replace(/الحدث:/g, '<span class="label-event">Event:</span>');
-        content = content.replace(/الأثر:/g, '<span class="label-impact">Impact:</span>');
+        let content = item.events ? item.events.replace(/\n/g, '<br>') : 'No data available.';
+        content = content.replace(/الحدث:/g, '<span class="label-event">EVENT:</span>');
 
         let links = '';
         if(item.links && item.links.length > 0) {
             links = `<div class="links-list">
-                <strong>Sources:</strong><br>
+                <strong>Sources:</strong> 
                 ${item.links.map(l => `<a href="${l.url}" target="_blank">${l.name}</a>`).join(' • ')}
             </div>`;
         }
@@ -202,7 +229,7 @@
             <button class="modal-close" onclick="closeModal()">×</button>
             <div class="modal-header">
                 <div class="modal-title">${item.name}</div>
-                ${item.subtitle ? `<div class="modal-subtitle">${item.subtitle}</div>` : ''}
+                <div class="modal-subtitle">${item.subtitle || 'Classified File'}</div>
             </div>
             <div class="data-body-text">${content}</div>
             ${links}
@@ -217,57 +244,52 @@
         document.body.style.overflow = '';
     };
     
-    // Close on backdrop click
     document.getElementById('detail-modal').addEventListener('click', (e) => {
         if (e.target.id === 'detail-modal') closeModal();
     });
 
 
-    // ==================== INITIALIZATION ====================
+    // ==================== ANIMATION LOOP ====================
+    let dragon;
+
     function resize() {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
-        particles = [];
-        for (let i = 0; i < CONFIG.particleCount; i++) particles.push(new Particle());
+        dragon = new ShadowDragon();
     }
 
     function animate() {
-        ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
+        // Clear with trail effect
+        ctx.fillStyle = 'rgba(8, 8, 8, 0.2)'; // Matches --bg with fade
         ctx.fillRect(0, 0, width, height);
-        ctx.globalCompositeOperation = 'lighter';
-        for (let i = 0; i < particles.length; i++) {
-            particles[i].update();
-            particles[i].draw();
-        }
-        ctx.globalCompositeOperation = 'source-over';
-        time++;
-        requestAnimationFrame(animate);
+
+        dragon.update();
+        dragon.draw();
+
+        animationId = requestAnimationFrame(animate);
     }
 
+    // ==================== STARTUP ====================
     function startSequence() {
-        // 1. Start Animation immediately
+        resize();
         animate();
 
-        // 2. Hide Loading after 3s
         setTimeout(() => {
             loadingOverlay.classList.add('hidden');
             
-            // 3. Show App
             setTimeout(() => {
                 mainApp.classList.add('visible');
-                initAppLogic(); // Initialize logic when app is visible
+                initAppLogic();
             }, 300);
 
         }, CONFIG.loadingDuration);
     }
 
-    // Event Listeners
+    // Events
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-    window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
     
     // Start
-    resize();
     startSequence();
 
 })();
