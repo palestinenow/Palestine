@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         draw() {
             const { r, g, b } = this.color;
             ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            // FIX: Reduced opacity to 0.15 to prevent white/grey fog buildup
+            // Reduced opacity to 0.15 to prevent white/grey fog buildup
             ctx.fillStyle = `rgba(${r},${g},${b},0.15)`; 
             ctx.fill();
         }
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; particles = []; for (let i = 0; i < CONFIG.particleCount; i++) particles.push(new Particle()); }
 
     function animate() {
-        // FIX: Using 0.015 alpha consistently. 
+        // Using 0.015 alpha consistently. 
         // Because particle opacity is now 0.15, this fade speed is perfect to clear trails in ~5s
         // without leaving grey residue.
         ctx.fillStyle = 'rgba(5, 5, 5, 0.015)';
