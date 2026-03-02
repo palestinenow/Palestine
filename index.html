@@ -4,29 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>REVOLUTION</title>
-    
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Inter:wght@200;400;600&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <span class="loading-text">REVOLUTION</span>
-    </div>
-
-    <!-- Dragon Wipe Overlay -->
+    <div class="loading-overlay" id="loadingOverlay"><span class="loading-text">REVOLUTION</span></div>
     <div id="dragon-wipe"></div>
-
-    <!-- Flow Field Canvas -->
     <canvas id="canvas"></canvas>
 
     <!-- Main Application -->
     <div id="main-app">
-        
-        <!-- Navigation -->
         <nav class="main-nav">
             <div class="logo">SYSTEM</div>
             <div class="nav-links">
@@ -40,21 +29,14 @@
             </div>
         </nav>
 
-        <!-- PAGES -->
-
         <!-- HOME -->
         <div id="page-home" class="page-view active">
             <h1 class="home-title">TIME OUT</h1>
-            <p class="home-subtitle">
-                Whether you believe this is real or not, it will not change reality. 
-                Add your state, president, and all the forces and power of your state. 
-                You should believe that even if your state is so powerful and advanced, 
-                without you there is no them.
-            </p>
+            <p class="home-subtitle">Whether you believe this is real or not, it will not change reality...</p>
             <button class="cta-btn" onclick="navigateTo('path')">Start The Path</button>
         </div>
 
-        <!-- PATH TO LIBERATION -->
+        <!-- PATH -->
         <div id="page-path" class="page-view">
             <div class="liberation-content">
                 <div class="lib-section"><h1 style="font-size: 2.5rem; margin-bottom: 1rem;">طريق التحرر</h1></div>
@@ -62,7 +44,7 @@
             </div>
         </div>
 
-        <!-- LIGHT PAGE (White Door) -->
+        <!-- LIGHT (White Door) -->
         <div id="page-light" class="page-view">
             <div style="height: 80vh; display: flex; align-items: center; justify-content: center;">
                 <div class="door-container" onclick="openBrain()">
@@ -72,115 +54,57 @@
             </div>
         </div>
 
-        <!-- COUNTRIES PAGE -->
-        <div id="page-countries" class="page-view">
-            <div class="section-header"><h2 class="section-title">تاريخ الدول العربية</h2></div>
-            <main id="countries-container"></main>
-        </div>
+        <!-- Other Pages (Countries, Palestine, etc) remain unchanged -->
+        <div id="page-countries" class="page-view"><div class="section-header"><h2 class="section-title">تاريخ الدول العربية</h2></div><main id="countries-container"></main></div>
+        <div id="page-palestine" class="page-view"><div class="section-header"><h2 class="section-title">فلسطين</h2></div><div id="palestine-grid" class="grid-container"></div></div>
+        <div id="page-sovereignty" class="page-view"><div class="section-header"><h2 class="section-title">السيادة المخطوفة</h2></div><div id="sovereignty-grid" class="grid-container"></div></div>
+        <div id="page-external" class="page-view"><div class="section-header"><h2 class="section-title">الأكاذيب المسيطرة</h2></div><div id="external-grid" class="grid-container"></div></div>
 
-        <!-- PALESTINE PAGE -->
-        <div id="page-palestine" class="page-view">
-            <div class="section-header"><h2 class="section-title">فلسطين</h2></div>
-            <div id="palestine-grid" class="grid-container"></div>
-        </div>
-
-        <!-- SOVEREIGNTY PAGE -->
-        <div id="page-sovereignty" class="page-view">
-            <div class="section-header"><h2 class="section-title">السيادة المخطوفة</h2></div>
-            <div id="sovereignty-grid" class="grid-container"></div>
-        </div>
-
-        <!-- EXTERNAL PAGE -->
-        <div id="page-external" class="page-view">
-            <div class="section-header"><h2 class="section-title">الأكاذيب المسيطرة</h2></div>
-            <div id="external-grid" class="grid-container"></div>
-        </div>
-
-        <!-- Donation Button -->
-        <button class="donate-btn" onclick="donateAlert()">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 13v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h.5z"/><path d="M8 4a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 8 4zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 10 4zm-4 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 4z"/></svg>
-            Donate
-        </button>
-
+        <button class="donate-btn" onclick="donateAlert()"><svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 13v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h.5z"/><path d="M8 4a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 8 4zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 10 4zm-4 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3A.5.5 0 0 1 6 4z"/></svg> Donate</button>
     </div>
 
     <!-- Modal -->
-    <div id="detail-modal" class="modal-overlay">
-        <div class="modal-content"><div id="modal-body"></div></div>
-    </div>
+    <div id="detail-modal" class="modal-overlay"><div class="modal-content"><div id="modal-body"></div></div></div>
 
-    <!-- BRAIN APP CONTAINER (Hidden by default) -->
+    <!-- BRAIN CONTAINER (HEAVEN THEME) -->
     <div id="brain-container">
-        <button class="back-btn-brain" onclick="closeBrain()">← Back to Revolution</button>
-        
-        <div class="brain-nature-bg"></div>
-        <div class="brain-soft-overlay"></div>
+        <button class="back-btn-heaven" onclick="closeBrain()">← Back to Revolution</button>
 
-        <!-- Brain Login Screen (Hidden initially via CSS and Logic) -->
-        <div class="brain-login-screen" id="brain-login" style="display: none;">
-            <!-- Content ignored because we skip it -->
-        </div>
+        <div class="heaven-layout">
+            <!-- Sidebar -->
+            <aside class="heaven-sidebar">
+                <div class="heaven-logo">🧠 الـبـرين</div>
+                <nav id="heaven-nav">
+                    <!-- Injected via JS -->
+                </nav>
+            </aside>
 
-        <!-- Brain Closed Screen (Hidden) -->
-        <div class="brain-closed-screen" id="brain-closed" style="display: none;">
-            <div class="brain-card">
-                <p style="font-size: 1.3rem; text-align: center;">عذراً، هذه الصفحة مغلقة للتطوير</p>
-            </div>
-        </div>
-
-        <!-- Brain Dashboard -->
-        <div class="brain-dashboard" id="brain-dashboard" style="display: none;">
-            <div class="brain-left-panel" id="brain-left-panel">
-                <div class="brain-panel-content">
-                    <h2 class="brain-panel-logo">🧠</h2>
-                    <nav class="brain-panel-nav">
-                        <button class="brain-action-btn active" onclick="document.getElementById('brain-search').focus()">
-                            <span>🔍</span><span class="label">بحث</span>
-                        </button>
-                        <button class="brain-action-btn" onclick="toggleBrainModal(true)">
-                            <span>➕</span><span class="label">إضافة</span>
-                        </button>
-                    </nav>
-                    <div class="brain-stats">
-                        <div class="brain-stat-item">
-                            <span class="brain-stat-value" id="brain-total">0</span>
-                            <span class="brain-stat-label">سؤال</span>
-                        </div>
-                    </div>
+            <!-- Main Content -->
+            <main class="heaven-main">
+                <!-- Search Box -->
+                <div class="heaven-search-box">
+                    <input type="text" id="heaven-search" class="heaven-search-input" placeholder="ابحث في أفكار القرآن..." oninput="handleHeavenSearch()">
+                    <span class="heaven-search-icon">🔍</span>
+                    <div id="heaven-autocomplete" class="heaven-autocomplete"></div>
                 </div>
-            </div>
-            <div class="brain-right-panel">
-                <div class="brain-search-section">
-                    <div class="brain-search-container">
-                        <input type="text" id="brain-search" placeholder="ابحث في المعرفة القرآنية..." oninput="handleBrainSearch()">
-                        <span class="brain-search-icon">🔍</span>
-                    </div>
+
+                <!-- Results Grid -->
+                <div id="heaven-results" class="heaven-results-grid">
+                    <!-- Injected via JS -->
                 </div>
-                <div class="brain-results-section">
-                    <div class="brain-results-container" id="brain-results"></div>
-                </div>
-            </div>
+            </main>
         </div>
 
-        <!-- Brain Add Modal -->
-        <div class="brain-modal-overlay" id="brain-modal" onclick="if(event.target === this) toggleBrainModal(false)">
-            <div class="brain-modal-content">
-                <button class="brain-modal-close" onclick="toggleBrainModal(false)">×</button>
-                <h2 style="color: #2c5f2d; padding: 30px 30px 10px;">إضافة سؤال جديد</h2>
-                <form onsubmit="addBrainQuestion(event)" style="padding: 0 30px 30px;">
-                    <div class="form-group"><label>السؤال *</label><input id="b-q" required></div>
-                    <div class="form-group"><label>الإجابة *</label><textarea id="b-a" rows="4" required></textarea></div>
-                    <div class="form-group"><label>المرجع</label><input id="b-r"></div>
-                    <div class="form-group"><label>كلمات مفتاحية (فواصل)</label><input id="b-k"></div>
-                    <button type="submit" class="submit-btn">حفظ</button>
-                </form>
+        <!-- Heaven Detail Modal -->
+        <div id="heaven-modal" class="heaven-modal-overlay" onclick="if(event.target === this) closeHeavenModal()">
+            <div class="heaven-modal-box">
+                <div id="heaven-modal-body"></div>
             </div>
         </div>
-        <div class="brain-toast" id="brain-toast">✓ تم الحفظ بنجاح</div>
     </div>
 
     <script src="data.js"></script>
+    <script src="data2.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-
