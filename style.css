@@ -1,4 +1,3 @@
-
 /* style.css */
 :root {
     --bg: #050505;
@@ -27,7 +26,7 @@ body, html {
 /* Canvas */
 #canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-/* Dragon Wipe (Initial Load) */
+/* Initial Dragon Wipe */
 #dragon-wipe { position: fixed; inset: 0; background: #000; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 1.5s ease-out; }
 #dragon-wipe.active { opacity: 1; pointer-events: all; }
 
@@ -37,14 +36,12 @@ body, html {
     top: 0; left: 0;
     width: 100%; height: 100%;
     background: #000000;
-    z-index: 2; /* Above canvas, below UI */
+    z-index: 2; /* Above canvas */
     transform: translateX(-100%); /* Start off-screen left */
     pointer-events: none;
     will-change: transform;
     transition: transform 0.6s cubic-bezier(0.6, 0, 0.9, 0.6); /* Fast move */
 }
-
-/* Class added by JS to trigger the wipe */
 .black-dragon.wipe {
     transform: translateX(100%); /* Move to right */
 }
@@ -55,7 +52,7 @@ body, html {
 
 /* Navigation */
 .main-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; padding: 1.5rem 3rem; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); }
-.logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; letter-spacing: 0.2em; text-transform: uppercase; }
+.logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; }
 .nav-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
 .nav-btn { background: transparent; border: none; font-family: 'Inter', sans-serif; font-size: 0.8rem; color: var(--muted); cursor: pointer; transition: color 0.3s; text-transform: uppercase; }
 .nav-btn:hover { color: var(--fg); }
