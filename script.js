@@ -54,8 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
     class Particle {
         constructor() { this.reset(); }
         reset() {
-            this.x = Math.random() * width;
-            this.y = Math.random() * height;
+            this.x = Math.random() * width; this.y = Math.random() * height;
             this.vx = 0; this.vy = 0;
             this.speed = Math.random() * 1.5 + 0.5;
             this.size = Math.max(0.5, Math.random() * 1.5 + 0.5);
@@ -68,8 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let fy = Math.sin(angle) * this.speed;
 
             if (mouse.x !== null && mouse.y !== null) {
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
+                const dx = mouse.x - this.x; const dy = mouse.y - this.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < mouse.radius && dist > 0) {
                     const force = (mouse.radius - dist) / mouse.radius;
@@ -78,18 +76,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     fy += Math.sin(pushAngle) * force * 3;
                 }
             }
-            this.vx += (fx - this.vx) * 0.1;
-            this.vy += (fy - this.vy) * 0.1;
-            this.x += this.vx;
-            this.y += this.vy;
+            this.vx += (fx - this.vx) * 0.1; this.vy += (fy - this.vy) * 0.1;
+            this.x += this.vx; this.y += this.vy;
             if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
         }
         draw() {
             const { r, g, b } = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${r},${g},${b},0.5)`; ctx.fill();
         }
     }
 
@@ -98,18 +92,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof levels === 'undefined') return;
 
         window.navigateTo = function(pageId) {
-            document.querySelectorAll('.page-view').forEach(el => {
-                el.classList.remove('active');
-                el.style.display = 'none';
-            });
+            document.querySelectorAll('.page-view').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-
             const target = document.getElementById(`page-${pageId}`);
-            if (target) {
-                target.style.display = 'block';
-                setTimeout(() => target.classList.add('active'), 10);
-                window.scrollTo({ top: 0, behavior: 'instant' });
-            }
+            if (target) { target.style.display = 'block'; setTimeout(() => target.classList.add('active'), 10); window.scrollTo({ top: 0, behavior: 'instant' }); }
             const btn = document.querySelector(`.nav-btn[data-page="${pageId}"]`);
             if (btn) btn.classList.add('active');
         };
@@ -119,8 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderApp() {
         const container = document.getElementById('countries-container');
-        if(!container) return;
-        container.innerHTML = '';
+        if(!container) return; container.innerHTML = '';
 
         for (let i = 1; i <= 5; i++) {
             const levelInfo = levels[i];
@@ -134,13 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h3 style="font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase;">${levelInfo.title}</h3>
                 </div>
                 <div class="grid-container">
-                    ${countries.map(c => `
-                        <div class="country-card" onclick="openModal(${c.id})">
-                            <div class="card-name">${c.name}</div>
-                            <div class="card-sub">${c.subtitle || ''}</div>
-                            <div class="card-action">View File</div>
-                        </div>
-                    `).join('')}
+                    ${countries.map(c => `<div class="country-card" onclick="openModal(${c.id})"><div class="card-name">${c.name}</div><div class="card-sub">${c.subtitle || ''}</div><div class="card-action">View File</div></div>`).join('')}
                 </div>
             `;
             container.appendChild(section);
@@ -154,181 +133,188 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderSpecial(type, gridId, items) {
         const grid = document.getElementById(gridId);
         if (!grid || items.length === 0) return;
-        
-        grid.innerHTML = items.map(item => `
-            <div class="country-card" onclick="openModal(${item.id})">
-                <div class="card-name">${item.name}</div>
-                <div class="card-sub">${item.subtitle || ''}</div>
-                <div class="card-action">Explore</div>
-            </div>
-        `).join('');
+        grid.innerHTML = items.map(item => `<div class="country-card" onclick="openModal(${item.id})"><div class="card-name">${item.name}</div><div class="card-sub">${item.subtitle || ''}</div><div class="card-action">Explore</div></div>`).join('');
     }
 
     // ==================== TABLE PARSER ====================
     function parseTextToHTML(text) {
         const lines = text.split('\n');
         let isTable = false;
-        if (lines.length > 2 && lines.filter(l => l.includes('\t')).length > 2) {
-            isTable = true;
-        }
-
+        if (lines.length > 2 && lines.filter(l => l.includes('\t')).length > 2) isTable = true;
         if (isTable) {
             const rows = lines.filter(l => l.trim() !== '');
             let html = '<table class="data-table">';
             rows.forEach((row, index) => {
                 const cells = row.split('\t');
                 const tag = index === 0 ? 'th' : 'td';
-                const rowTag = index === 0 ? 'thead' : (index === 1 ? 'tbody' : '');
-                const rowClose = index === 0 ? '</thead>' : (index === rows.length - 1 ? '</tbody>' : '');
-                const rowOpen = index === 0 ? '<thead>' : (index === 1 ? '<tbody>' : '');
-
-                if (rowOpen) html += rowOpen;
-                html += '<tr>';
-                cells.forEach(cell => { html += `<${tag}>${cell.trim()}</${tag}>`; });
-                html += '</tr>';
-                if (rowClose) html += rowClose;
+                if(index === 0) html += '<thead>';
+                if(index === 1) html += '<tbody>';
+                html += '<tr>'; cells.forEach(cell => { html += `<${tag}>${cell.trim()}</${tag}>`; }); html += '</tr>';
+                if(index === 0) html += '</thead>';
+                if(index === rows.length - 1) html += '</tbody>';
             });
-            html += '</table>';
-            return html;
-        } else {
-            return text.replace(/\n/g, '<br>');
-        }
+            html += '</table>'; return html;
+        } else return text.replace(/\n/g, '<br>');
     }
 
     window.openModal = function(id) {
-        const item = countriesData.find(c => c.id === id);
-        if (!item) return;
-
-        const modal = document.getElementById('detail-modal');
-        const body = document.getElementById('modal-body');
+        const item = countriesData.find(c => c.id === id); if (!item) return;
+        const modal = document.getElementById('detail-modal'); const body = document.getElementById('modal-body');
         let content = parseTextToHTML(item.events || '');
-        
         body.innerHTML = `
             <button class="modal-close" onclick="closeModal()">×</button>
-            <div style="margin-bottom: 2rem;">
-                <div style="font-size: 2rem; margin-bottom: 0.5rem;">${item.name}</div>
-                <div style="font-size: 0.9rem; color: var(--muted);">${item.subtitle || ''}</div>
-            </div>
+            <div style="margin-bottom: 2rem;"><div style="font-size: 2rem; margin-bottom: 0.5rem;">${item.name}</div><div style="font-size: 0.9rem; color: var(--muted);">${item.subtitle || ''}</div></div>
             <div class="data-body-text">${content}</div>
         `;
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        modal.classList.add('active'); document.body.style.overflow = 'hidden';
     };
 
-    window.closeModal = function() {
-        document.getElementById('detail-modal').classList.remove('active');
-        document.body.style.overflow = '';
-    };
-    
-    document.getElementById('detail-modal').addEventListener('click', (e) => {
-        if (e.target.id === 'detail-modal') closeModal();
-    });
+    window.closeModal = function() { document.getElementById('detail-modal').classList.remove('active'); document.body.style.overflow = ''; };
+    document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeModal(); });
+    window.donateAlert = function() { const address = "bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4"; navigator.clipboard.writeText(address).then(() => alert("BTC Address copied!"), () => alert("BTC: " + address)); };
 
-    window.donateAlert = function() {
-        const address = "bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4";
-        navigator.clipboard.writeText(address).then(() => alert("BTC Address copied!"), () => alert("BTC: " + address));
-    };
-
-    // ==================== LIGHT PAGE & BRAIN LOGIC ====================
+    // ==================== LIGHT PAGE & BRAIN HEAVEN LOGIC ====================
     window.openBrain = function() {
         brainContainer.classList.add('visible');
-        // Directly show dashboard, skipping login
-        document.getElementById('brain-login').style.display = 'none';
-        document.getElementById('brain-closed').style.display = 'none';
-        document.getElementById('brain-dashboard').style.display = 'flex';
-        showAllBrainQuestions();
-        updateBrainStats();
+        initHeaven(); // Initialize the new logic
     };
 
     window.closeBrain = function() {
         brainContainer.classList.remove('visible');
     };
+    
+    // Heaven Logic
+    let activeCategory = "all";
 
-    // Brain App Data
-    const quranData = [
-        { id: 1, question: "ما معنى الصبر في القرآن؟", answer: "الصبر هو حبس النفس عن الجزع والتسخط...", reference: "سورة البقرة ٢:١٥٣", keywords: ["صبر"] },
-        { id: 2, question: "ما هي آية الكرسي؟", answer: "﴿اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ...﴾", reference: "سورة البقرة ٢:٢٥٥", keywords: ["آية الكرسي"] }
-    ];
-
-    function showAllBrainQuestions() {
-        displayBrainResults(quranData);
+    function initHeaven() {
+        // Check if data exists
+        if (typeof brainData === 'undefined' || typeof brainCategories === 'undefined') {
+            console.error("data2.js is missing or empty");
+            return;
+        }
+        
+        // Render Categories
+        renderCategories();
+        // Render All Cards initially
+        filterHeavenData();
     }
 
-    window.handleBrainSearch = function() {
-        const q = document.getElementById('brain-search').value.trim();
-        if (q.length > 0) {
-            const r = quranData.filter(i => i.question.includes(q) || i.answer.includes(q) || i.keywords.some(k => k.includes(q)));
-            displayBrainResults(r);
-        } else showAllBrainQuestions();
+    function renderCategories() {
+        const nav = document.getElementById('heaven-nav');
+        nav.innerHTML = `
+            <button class="heaven-cat-btn active" onclick="setCategory('all')">✨ الكل</button>
+            ${brainCategories.map(c => `
+                <button class="heaven-cat-btn" onclick="setCategory('${c.id}')">${c.icon} ${c.name}</button>
+            `).join('')}
+        `;
     }
 
-    function displayBrainResults(res) {
-        const c = document.getElementById('brain-results');
-        c.innerHTML = res.length === 0 ? '<div class="brain-result-card"><p>لا توجد نتائج</p></div>' : 
-        res.map(i => `
-            <div class="brain-result-card">
-                <div class="brain-result-question">${i.question}</div>
-                <div class="brain-result-answer">${i.answer}</div>
-                <div class="brain-result-reference">📖 ${i.reference}</div>
+    window.setCategory = function(id) {
+        activeCategory = id;
+        // Update active button
+        document.querySelectorAll('.heaven-cat-btn').forEach(btn => btn.classList.remove('active'));
+        // Find the button that triggered it (simplest is to pass 'this' but onclick string limits us, so we search)
+        const btns = document.querySelectorAll('.heaven-cat-btn');
+        btns.forEach(b => { if(b.getAttribute('onclick').includes(`'${id}'`)) b.classList.add('active'); });
+        
+        filterHeavenData();
+    }
+
+    window.filterHeavenData = function() {
+        let data = brainData;
+        if (activeCategory !== 'all') {
+            data = brainData.filter(d => d.category === activeCategory);
+        }
+        renderHeavenCards(data);
+    }
+
+    function renderHeavenCards(data) {
+        const grid = document.getElementById('heaven-results');
+        grid.innerHTML = data.map(item => `
+            <div class="heaven-card" onclick="openHeavenModal(${item.id})">
+                <div class="heaven-card-q">${item.question}</div>
+                <div class="heaven-card-a">${item.answer.substring(0, 100)}...</div>
+                <div class="heaven-card-ref">📖 ${item.reference}</div>
             </div>
         `).join('');
     }
 
-    function updateBrainStats() {
-        document.getElementById('brain-total').textContent = quranData.length;
+    // Advanced Search
+    window.handleHeavenSearch = function() {
+        const q = document.getElementById('heaven-search').value.trim();
+        const dropdown = document.getElementById('heaven-autocomplete');
+        
+        if (q.length < 1) {
+            dropdown.classList.remove('show');
+            filterHeavenData(); // Reset to category view
+            return;
+        }
+
+        const results = brainData.filter(d => 
+            d.question.includes(q) || d.answer.includes(q)
+        );
+
+        if (results.length > 0) {
+            dropdown.innerHTML = results.slice(0, 5).map(item => `
+                <div class="heaven-autocomplete-item" onclick="selectHeavenSuggestion(${item.id})">
+                    <q>${item.question}</q>
+                    <span>${item.reference}</span>
+                </div>
+            `).join('');
+            dropdown.classList.add('show');
+        } else {
+            dropdown.innerHTML = `<div class="heaven-autocomplete-item"><q>لا توجد نتائج</q></div>`;
+            dropdown.classList.add('show');
+        }
+
+        // Render main results immediately as well
+        renderHeavenCards(results);
     }
 
-    window.toggleBrainModal = function(show) {
-        const m = document.getElementById('brain-modal');
-        if(show) m.classList.add('show'); else m.classList.remove('show');
+    window.selectHeavenSuggestion = function(id) {
+        document.getElementById('heaven-autocomplete').classList.remove('show');
+        openHeavenModal(id);
     }
 
-    window.addBrainQuestion = function(e) {
-        e.preventDefault();
-        const nQ = {
-            id: quranData.length + 1,
-            question: document.getElementById('b-q').value,
-            answer: document.getElementById('b-a').value,
-            reference: document.getElementById('b-r').value || "غير محدد",
-            keywords: document.getElementById('b-k').value.split(',')
-        };
-        quranData.push(nQ);
-        showAllBrainQuestions();
-        updateBrainStats();
-        toggleBrainModal(false);
-        const t = document.getElementById('brain-toast');
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
-    };
+    window.openHeavenModal = function(id) {
+        const item = brainData.find(d => d.id === id);
+        if(!item) return;
+        
+        const modal = document.getElementById('heaven-modal');
+        const body = document.getElementById('heaven-modal-body');
+        body.innerHTML = `
+            <button class="heaven-modal-close" onclick="closeHeavenModal()">×</button>
+            <div class="heaven-modal-q">${item.question}</div>
+            <div class="heaven-modal-a">${item.answer}<br><br><em style="color:#8e9eab;">📖 ${item.reference}</em></div>
+        `;
+        modal.classList.add('show');
+    }
+
+    window.closeHeavenModal = function() {
+        document.getElementById('heaven-modal').classList.remove('show');
+    }
 
     // ==================== ANIMATION LOOP ====================
     function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+        width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight;
         particles = [];
         for (let i = 0; i < CONFIG.particleCount; i++) particles.push(new Particle());
     }
 
     function animate() {
-        if (time > CONFIG.cleanupTime) ctx.fillStyle = 'rgba(5, 5, 5, 0.2)'; 
-        else ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
-
+        if (time > CONFIG.cleanupTime) ctx.fillStyle = 'rgba(5, 5, 5, 0.2)'; else ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
         ctx.fillRect(0, 0, width, height);
-        
         if (time < CONFIG.cleanupTime + 200) {
             ctx.globalCompositeOperation = 'lighter';
             for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); }
             ctx.globalCompositeOperation = 'source-over';
         }
-        
-        time++;
-        requestAnimationFrame(animate);
+        time++; requestAnimationFrame(animate);
     }
 
     // ==================== LOADING SEQUENCE ====================
     function startSequence() {
-        resize();
-        animate();
+        resize(); animate();
         setTimeout(() => {
             loadingOverlay.classList.add('hidden');
             setTimeout(() => {
@@ -339,7 +325,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, CONFIG.loadingDuration);
     }
 
-    // Events
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
     window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
