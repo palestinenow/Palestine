@@ -10,15 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainApp = document.getElementById('main-app');
     const dragonWipe = document.getElementById('dragon-wipe');
     const brainContainer = document.getElementById('brain-container');
-    const blackDragon = document.getElementById('black-dragon'); // Recurring Dragon
+    const blackDragon = document.getElementById('black-dragon');
 
     // ==================== CONFIGURATION ====================
     const CONFIG = {
         particleCount: 800,
         noiseScale: 0.005,
         mouseRadius: 150,
-        fadeSpeed: 0.015, // FIX: 0.015 makes trails last ~5 seconds
-        cleanupTime: 4000,
+        fadeSpeed: 0.015, // Correct speed for 5-second trail
         loadingDuration: 2000, 
         palette: [
             { r: 0, g: 122, b: 61 },    // Green
@@ -32,7 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let width = 0, height = 0;
     let particles = [];
     let time = 0;
-    let animationActive = true;
     const mouse = { x: null, y: null, radius: CONFIG.mouseRadius };
 
     // ==================== SIMPLEX NOISE ====================
@@ -62,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.color = CONFIG.palette[Math.floor(Math.random() * CONFIG.palette.length)];
         }
         update() {
-            if (!animationActive) return;
             const angle = noise.noise(this.x * CONFIG.noiseScale, this.y * CONFIG.noiseScale, time * 0.0003) * Math.PI * 4;
             let fx = Math.cos(angle) * this.speed;
             let fy = Math.sin(angle) * this.speed;
@@ -84,14 +81,15 @@ document.addEventListener('DOMContentLoaded', function() {
         draw() {
             const { r, g, b } = this.color;
             ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${r},${g},${b},0.5)`; ctx.fill();
+            // FIX: Reduced opacity to 0.15 to prevent white/grey fog buildup
+            ctx.fillStyle = `rgba(${r},${g},${b},0.15)`; 
+            ctx.fill();
         }
     }
 
     // ==================== APP LOGIC ====================
     function initAppLogic() {
         if (typeof levels === 'undefined') return;
-
         window.navigateTo = function(pageId) {
             document.querySelectorAll('.page-view').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -100,19 +98,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const btn = document.querySelector(`.nav-btn[data-page="${pageId}"]`);
             if (btn) btn.classList.add('active');
         };
-
         renderApp();
     }
 
     function renderApp() {
         const container = document.getElementById('countries-container');
         if(!container) return; container.innerHTML = '';
-
         for (let i = 1; i <= 5; i++) {
             const levelInfo = levels[i];
             const countries = countriesData.filter(c => c.level === i);
             if (countries.length === 0) continue;
-
             const section = document.createElement('section');
             section.className = 'level-section';
             section.innerHTML = `
@@ -125,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             container.appendChild(section);
         }
-
         renderSpecial('palestine', 'palestine-grid', countriesData.filter(c => c.id === 100));
         renderSpecial('sovereignty', 'sovereignty-grid', countriesData.filter(c => c.id >= 101 && c.id < 200));
         renderSpecial('external', 'external-grid', countriesData.filter(c => c.id >= 200));
@@ -137,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
         grid.innerHTML = items.map(item => `<div class="country-card" onclick="openModal(${item.id})"><div class="card-name">${item.name}</div><div class="card-sub">${item.subtitle || ''}</div><div class="card-action">Explore</div></div>`).join('');
     }
 
-    // ==================== TABLE PARSER ====================
     function parseTextToHTML(text) {
         const lines = text.split('\n');
         let isTable = false;
@@ -174,11 +167,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('detail-modal').addEventListener('click', (e) => { if (e.target.id === 'detail-modal') closeModal(); });
     window.donateAlert = function() { const address = "bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4"; navigator.clipboard.writeText(address).then(() => alert("BTC Address copied!"), () => alert("BTC: " + address)); };
 
-    // ==================== LIGHT PAGE & BRAIN HEAVEN LOGIC ====================
+    // ==================== BRAIN LOGIC ====================
     window.openBrain = function() { brainContainer.classList.add('visible'); initHeaven(); };
     window.closeBrain = function() { brainContainer.classList.remove('visible'); };
     
-    // Heaven Logic
     let activeCategory = "all";
     function initHeaven() {
         if (typeof brainData === 'undefined' || typeof brainCategories === 'undefined') return;
@@ -245,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.closeHeavenModal = function() { const modal = document.getElementById('heaven-modal'); if(modal) modal.classList.remove('show'); };
 
-    // ==================== SECRET ADMIN ACCESS (5 Clicks) ====================
+    // ==================== SECRET ADMIN ACCESS ====================
     let clickCount = 0; let clickTimer = null;
     const logo = document.querySelector('.logo');
     if (logo) {
@@ -258,25 +250,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ==================== RECURRING BLACK DRAGON (Every 15-30s) ====================
+    // ==================== RECURRING BLACK DRAGON ====================
     function scheduleDragon() {
         const delay = 15000 + Math.random() * 15000; // 15s to 30s
         setTimeout(() => {
-            // Trigger the wipe animation
             blackDragon.classList.add('wipe');
-            
-            // Reset position after animation ends (0.6s in CSS)
             setTimeout(() => {
-                // Instantly move it back to start without transition
                 blackDragon.style.transition = 'none';
-                blackDragon.classList.remove('wipe'); // Remove wipe class
-                // Force reflow
+                blackDragon.classList.remove('wipe');
                 void blackDragon.offsetWidth; 
-                // Restore transition for next time
                 blackDragon.style.transition = 'transform 0.6s cubic-bezier(0.6, 0, 0.9, 0.6)';
-            }, 600); // Match CSS transition duration
-
-            // Loop
+            }, 600);
             scheduleDragon();
         }, delay);
     }
@@ -285,16 +269,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; particles = []; for (let i = 0; i < CONFIG.particleCount; i++) particles.push(new Particle()); }
 
     function animate() {
-        // Using 0.015 alpha means trails fade over ~5 seconds
-        if (time > CONFIG.cleanupTime) ctx.fillStyle = 'rgba(5, 5, 5, 0.015)'; 
-        else ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
-        
+        // FIX: Using 0.015 alpha consistently. 
+        // Because particle opacity is now 0.15, this fade speed is perfect to clear trails in ~5s
+        // without leaving grey residue.
+        ctx.fillStyle = 'rgba(5, 5, 5, 0.015)';
         ctx.fillRect(0, 0, width, height);
-        if (time < CONFIG.cleanupTime + 200) {
-            ctx.globalCompositeOperation = 'lighter';
-            for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); }
-            ctx.globalCompositeOperation = 'source-over';
-        }
+
+        ctx.globalCompositeOperation = 'lighter';
+        for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); }
+        ctx.globalCompositeOperation = 'source-over';
+
         time++; requestAnimationFrame(animate);
     }
 
@@ -316,6 +300,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
     
     startSequence();
-    scheduleDragon(); // Start the recurring dragon loop
+    scheduleDragon();
 
 });
