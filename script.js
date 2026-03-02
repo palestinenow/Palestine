@@ -13,17 +13,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ==================== CONFIGURATION ====================
     const CONFIG = {
-        particleCount: 800, // Optimized count
+        particleCount: 800,
         noiseScale: 0.005,
         mouseRadius: 150,
         fadeSpeed: 0.05,
-        cleanupTime: 4000, // 4 seconds
+        cleanupTime: 4000,
         loadingDuration: 2000, 
         palette: [
-            { r: 0, g: 122, b: 61 },    // Green
-            { r: 255, g: 255, b: 255 }, // White
-            { r: 30, g: 30, b: 35 },    // Near-black
-            { r: 206, g: 17, b: 38 }    // Red
+            { r: 0, g: 122, b: 61 },
+            { r: 255, g: 255, b: 255 },
+            { r: 30, g: 30, b: 35 },
+            { r: 206, g: 17, b: 38 }
         ]
     };
 
@@ -164,13 +164,10 @@ document.addEventListener('DOMContentLoaded', function() {
         `).join('');
     }
 
-    // ==================== TABLE PARSER LOGIC ====================
+    // ==================== TABLE PARSER ====================
     function parseTextToHTML(text) {
-        // Check if text contains tabs or multiple spaces that suggest a table
         const lines = text.split('\n');
         let isTable = false;
-        
-        // Simple heuristic: if multiple lines have tabs
         if (lines.length > 2 && lines.filter(l => l.includes('\t')).length > 2) {
             isTable = true;
         }
@@ -178,7 +175,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isTable) {
             const rows = lines.filter(l => l.trim() !== '');
             let html = '<table class="data-table">';
-            
             rows.forEach((row, index) => {
                 const cells = row.split('\t');
                 const tag = index === 0 ? 'th' : 'td';
@@ -188,17 +184,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (rowOpen) html += rowOpen;
                 html += '<tr>';
-                cells.forEach(cell => {
-                    html += `<${tag}>${cell.trim()}</${tag}>`;
-                });
+                cells.forEach(cell => { html += `<${tag}>${cell.trim()}</${tag}>`; });
                 html += '</tr>';
                 if (rowClose) html += rowClose;
             });
-            
             html += '</table>';
             return html;
         } else {
-            // Standard text with line breaks
             return text.replace(/\n/g, '<br>');
         }
     }
@@ -209,8 +201,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const modal = document.getElementById('detail-modal');
         const body = document.getElementById('modal-body');
-        
-        // Use the table parser
         let content = parseTextToHTML(item.events || '');
         
         body.innerHTML = `
@@ -221,7 +211,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="data-body-text">${content}</div>
         `;
-
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     };
@@ -237,35 +226,80 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.donateAlert = function() {
         const address = "bc1qs642vuwxtwn5z926uuhnc6t33u42csdhes09c4";
-        navigator.clipboard.writeText(address).then(() => {
-            alert("BTC Address copied: " + address);
-        }, () => {
-            alert("BTC: " + address);
-        });
+        navigator.clipboard.writeText(address).then(() => alert("BTC Address copied!"), () => alert("BTC: " + address));
     };
 
     // ==================== LIGHT PAGE & BRAIN LOGIC ====================
     window.openBrain = function() {
         brainContainer.classList.add('visible');
-        // Initialize Brain App Logic (if not already done)
-        if (!window.brainInitialized) {
-            initBrainApp();
-            window.brainInitialized = true;
-        }
+        // Directly show dashboard, skipping login
+        document.getElementById('brain-login').style.display = 'none';
+        document.getElementById('brain-closed').style.display = 'none';
+        document.getElementById('brain-dashboard').style.display = 'flex';
+        showAllBrainQuestions();
+        updateBrainStats();
     };
 
     window.closeBrain = function() {
         brainContainer.classList.remove('visible');
     };
 
-    function initBrainApp() {
-        // We need to execute the brain script logic manually because it's inserted dynamically
-        const brainScript = document.querySelector('#brain-container script');
-        if (brainScript) {
-            // The script content is below in the HTML, it will run automatically 
-            // but variables might be local. We wrap them in window.
-        }
+    // Brain App Data
+    const quranData = [
+        { id: 1, question: "ما معنى الصبر في القرآن؟", answer: "الصبر هو حبس النفس عن الجزع والتسخط...", reference: "سورة البقرة ٢:١٥٣", keywords: ["صبر"] },
+        { id: 2, question: "ما هي آية الكرسي؟", answer: "﴿اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ...﴾", reference: "سورة البقرة ٢:٢٥٥", keywords: ["آية الكرسي"] }
+    ];
+
+    function showAllBrainQuestions() {
+        displayBrainResults(quranData);
     }
+
+    window.handleBrainSearch = function() {
+        const q = document.getElementById('brain-search').value.trim();
+        if (q.length > 0) {
+            const r = quranData.filter(i => i.question.includes(q) || i.answer.includes(q) || i.keywords.some(k => k.includes(q)));
+            displayBrainResults(r);
+        } else showAllBrainQuestions();
+    }
+
+    function displayBrainResults(res) {
+        const c = document.getElementById('brain-results');
+        c.innerHTML = res.length === 0 ? '<div class="brain-result-card"><p>لا توجد نتائج</p></div>' : 
+        res.map(i => `
+            <div class="brain-result-card">
+                <div class="brain-result-question">${i.question}</div>
+                <div class="brain-result-answer">${i.answer}</div>
+                <div class="brain-result-reference">📖 ${i.reference}</div>
+            </div>
+        `).join('');
+    }
+
+    function updateBrainStats() {
+        document.getElementById('brain-total').textContent = quranData.length;
+    }
+
+    window.toggleBrainModal = function(show) {
+        const m = document.getElementById('brain-modal');
+        if(show) m.classList.add('show'); else m.classList.remove('show');
+    }
+
+    window.addBrainQuestion = function(e) {
+        e.preventDefault();
+        const nQ = {
+            id: quranData.length + 1,
+            question: document.getElementById('b-q').value,
+            answer: document.getElementById('b-a').value,
+            reference: document.getElementById('b-r').value || "غير محدد",
+            keywords: document.getElementById('b-k').value.split(',')
+        };
+        quranData.push(nQ);
+        showAllBrainQuestions();
+        updateBrainStats();
+        toggleBrainModal(false);
+        const t = document.getElementById('brain-toast');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    };
 
     // ==================== ANIMATION LOOP ====================
     function resize() {
@@ -276,22 +310,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function animate() {
-        // Logic to fade out background animation after 4s
-        if (time > CONFIG.cleanupTime) {
-            // Make trails disappear faster (clear canvas more aggressively)
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)'; 
-        } else {
-            ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
-        }
+        if (time > CONFIG.cleanupTime) ctx.fillStyle = 'rgba(5, 5, 5, 0.2)'; 
+        else ctx.fillStyle = `rgba(5,5,5,${CONFIG.fadeSpeed})`;
 
         ctx.fillRect(0, 0, width, height);
         
-        if (time < CONFIG.cleanupTime + 200) { // Stop drawing new particles after a while to let them fade
+        if (time < CONFIG.cleanupTime + 200) {
             ctx.globalCompositeOperation = 'lighter';
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-            }
+            for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); }
             ctx.globalCompositeOperation = 'source-over';
         }
         
@@ -299,29 +325,17 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(animate);
     }
 
-    // ==================== LOADING & DRAGON SEQUENCE ====================
+    // ==================== LOADING SEQUENCE ====================
     function startSequence() {
         resize();
         animate();
-
         setTimeout(() => {
             loadingOverlay.classList.add('hidden');
-
             setTimeout(() => {
                 dragonWipe.classList.add('active');
-                
-                setTimeout(() => {
-                    mainApp.classList.add('visible');
-                    initAppLogic();
-                }, 500);
-
-                setTimeout(() => {
-                    dragonWipe.style.transition = "opacity 2.5s ease-out";
-                    dragonWipe.classList.remove('active');
-                }, 1000);
-
+                setTimeout(() => { mainApp.classList.add('visible'); initAppLogic(); }, 500);
+                setTimeout(() => { dragonWipe.style.transition = "opacity 2.5s ease-out"; dragonWipe.classList.remove('active'); }, 1000);
             }, 500);
-
         }, CONFIG.loadingDuration);
     }
 
